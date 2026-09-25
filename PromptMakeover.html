@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prompt makeover: from request to delegation brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1F2A4D; --orange:#B5520F; --paper:#F6F8FB; --panel:#EEF2F8; --card:#FFFFFF;
+  --ink:#1F2A4D; --muted:#5A6480; --line:#D4DBE8; --good:#1E7A4F; --good-bg:#E4F4EC;
+  --meter-off:#D4DBE8; --focus:#FFB35C;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#E8ECF5; --paper:#121827; --panel:#1B2338; --card:#232C45; --ink:#E8ECF5; --muted:#A3ADC6;
+    --line:#34405F; --good:#5FD39A; --good-bg:#16352A; --orange:#F08A45; --meter-off:#34405F;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#E8ECF5; --paper:#121827; --panel:#1B2338; --card:#232C45; --ink:#E8ECF5; --muted:#A3ADC6;
+  --line:#34405F; --good:#5FD39A; --good-bg:#16352A; --orange:#F08A45; --meter-off:#34405F;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
+  font-family:Figtree,"Segoe UI",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 24px 48px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:18px}
+h1{margin:0;font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.02em;color:var(--navy)}
+.lede{margin:6px 0 0;color:var(--muted);max-width:64ch}
+button{font:inherit;font-weight:600;border-radius:8px;padding:9px 15px;cursor:pointer;border:2px solid var(--navy);background:transparent;color:var(--navy)}
+button.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+button.small{padding:3px 10px;font-size:13px;border-width:1.5px;border-color:var(--line);color:var(--muted)}
+button:focus-visible,textarea:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.timer{display:flex;align-items:center;gap:10px}
+.clock{font-size:28px;font-weight:800;min-width:78px;text-align:right;font-variant-numeric:tabular-nums}
+.clock.done{color:var(--orange)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.tab{border-width:1.5px;border-color:var(--line);color:var(--muted);background:var(--card)}
+.tab[aria-selected="true"]{border-color:var(--navy);background:var(--navy);color:var(--paper)}
+.before{background:var(--card);border-left:6px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:20px}
+.before small{display:block;color:var(--muted);font-size:14px;margin-bottom:4px}
+.before p{margin:0;font-size:clamp(18px,2.2vw,22px);font-weight:600;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.05fr 1fr;gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.fields{display:flex;flex-direction:column;gap:12px}
+.field{background:var(--panel);border-radius:12px;padding:12px 14px}
+.field-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.field label{font-weight:700;font-size:16px}
+.field .q{color:var(--muted);font-size:14px;margin:0 0 6px}
+.field.filled label::after{content:" ✓";color:var(--good)}
+textarea{width:100%;min-height:58px;resize:vertical;font:inherit;font-size:15px;color:var(--ink);background:var(--card);
+  border:1.5px solid var(--line);border-radius:8px;padding:8px 10px}
+.side{position:sticky;top:calc(16px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:14px}
+.meter{background:var(--card);border-radius:12px;padding:14px 16px;border:1.5px solid var(--line)}
+.bars{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:8px 0 6px}
+.bars span{height:10px;border-radius:5px;background:var(--meter-off);transition:background .2s}
+.bars span.on{background:var(--orange)}
+.bars.full span.on{background:var(--good)}
+.meter-label{font-weight:700;font-size:18px}
+.meter-hint{color:var(--muted);font-size:14px}
+.preview{background:var(--card);border-radius:12px;padding:16px;border:1.5px solid var(--line)}
+.preview h2,.model h2{margin:0 0 8px;font-size:17px}
+.prompt-out{white-space:pre-wrap;background:var(--panel);border-radius:10px;padding:12px 14px;min-height:90px;font-size:15px}
+.prompt-out.empty{color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.model{display:none;background:var(--good-bg);border-radius:12px;padding:16px;border:1.5px solid var(--good)}
+.model.show{display:block}
+.model p{margin:0 0 8px}
+.model ul{margin:0;padding-left:20px;font-size:15px}
+.toast{min-height:1.3em;color:var(--good);font-weight:600;font-size:14px}
+@media (prefers-reduced-motion:reduce){.bars span{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Prompt makeover</h1>
+      <p class="lede">Turn a vague request into a brief Cowork can run with. Fill in the five parts, watch the prompt build on the right, then compare with a model brief. In breakouts, each group takes one request.</p>
+    </div>
+    <div class="timer">
+      <span class="clock" id="clock">5:00</span>
+      <button id="timerBtn">Start timer</button>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+
+  <div class="before"><small>The vague request</small><p id="vague"></p></div>
+
+  <div class="grid">
+    <div class="fields" id="fields"></div>
+    <aside class="side">
+      <div class="meter">
+        <div class="meter-label" id="meterLabel"></div>
+        <div class="bars" id="bars"><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="meter-hint" id="meterHint"></div>
+      </div>
+      <div class="preview">
+        <h2>Your delegation brief</h2>
+        <div class="prompt-out" id="out"></div>
+        <div class="bar">
+          <button class="primary" id="copy">Copy prompt</button>
+          <button id="showModel">Compare with model brief</button>
+          <button id="clear">Clear</button>
+        </div>
+        <div class="toast" id="toast" aria-live="polite"></div>
+      </div>
+      <div class="model" id="model">
+        <h2>Model brief</h2>
+        <p id="modelText"></p>
+        <ul id="modelWhy"></ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const PARTS = [
+  {key:"goal",  label:"Outcome",     q:"What does done look like, and what's it for?", lead:""},
+  {key:"src",   label:"Sources",     q:"Where should Cowork look? Name files, channels, people, time window.", lead:"Use "},
+  {key:"out",   label:"Output",      q:"What should it produce? Format, length, sections.", lead:"Produce "},
+  {key:"rules", label:"Constraints", q:"Scope, tone, audience, and anything to avoid.", lead:""},
+  {key:"check", label:"Checkpoint",  q:"When should it stop and check with you?", lead:""}
+];
+
+const CASES = [
+ {name:"Supplier review",
+  vague:"Get me ready for the supplier review.",
+  ex:{goal:"Prepare me for next Wednesday's quarterly review with [supplier] so I can press them on delivery performance.",
+      src:"the last 90 days of emails with [supplier], the delivery KPI sheet in [file] and notes from our last two review meetings.",
+      out:"a 1-page Word briefing with delivery and quality trends, open escalations with dates, and 5 questions I should ask.",
+      rules:"Keep it factual and neutral in tone. Don't include pricing or contract terms.",
+      check:"Show me the list of open escalations before you write the briefing."},
+  why:["States the purpose, which shapes what Cowork emphasizes.","Keeps sensitive commercial terms out on purpose.","Checks the facts early, before effort goes into the write-up."]},
+ {name:"Allocation issue recap",
+  vague:"Summarize what happened with the wafer allocation issue.",
+  ex:{goal:"Give my director a clear recap of the wafer allocation issue so she can decide on next steps.",
+      src:"the [issue] Teams channel, related email threads since 1 September, and the allocation plan in [file].",
+      out:"a half-page summary: timeline of key events, current status, open decisions, and who owns each.",
+      rules:"Write for a senior reader: plain language, no internal jargon. Flag anything that's disputed rather than picking a side.",
+      check:"Check with me before adding any recommendations."},
+  why:["Names the audience, which sets the level of detail.","Asks for disputes to be flagged, not resolved.","Keeps recommendations as a human decision."]},
+ {name:"Town hall deck",
+  vague:"Make a deck for the town hall.",
+  ex:{goal:"Create slides for my 15-minute section of the [team] town hall on H2 priorities.",
+      src:"our H2 plan in [file], the last three monthly updates, and the wins posted in the [channel] Teams channel.",
+      out:"a 6-slide deck: one opening slide, three priority slides with a headline and 3 points each, one on team wins, one on how people can help.",
+      rules:"Upbeat but honest. Use our company template in [file]. No customer names on the slides.",
+      check:"Show me the slide outline before building the full deck."},
+  why:["Gives timing and slide count, so the scope is clear.","Specifies a template and what to leave out.","Outline-first checkpoint saves rework."]},
+ {name:"Inbox catch-up",
+  vague:"Sort out my inbox from this week.",
+  ex:{goal:"Help me catch up after a week of travel so nothing important slips.",
+      src:"my inbox from Monday to today, focusing on emails where I'm in the To line.",
+      out:"a table of emails needing action, with sender, topic, what's being asked and a suggested priority, plus draft replies for the top 5.",
+      rules:"Skip newsletters and automated notifications. Keep draft replies short.",
+      check:"Don't send, move or delete anything. Leave the drafts for me to review."},
+  why:["Defines what counts as important.","Asks for a table, which makes triage fast.","Draws a firm line on what Cowork may do in your mailbox."]}
+];
+
+let current = 0;
+const $ = id => document.getElementById(id);
+const vals = {};
+
+function renderTabs(){
+  $('tabs').innerHTML='';
+  CASES.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='tab'; b.setAttribute('role','tab'); b.textContent=c.name; b.setAttribute('aria-selected',i===current);
+    b.onclick=()=>{current=i; load()};
+    $('tabs').appendChild(b);
+  });
+}
+
+function renderFields(){
+  $('fields').innerHTML='';
+  PARTS.forEach(p=>{
+    const f=document.createElement('div'); f.className='field'; f.id='f-'+p.key;
+    f.innerHTML=`<div class="field-head"><label for="t-${p.key}"></label><button class="small">Show example</button></div>
+      <p class="q"></p><textarea id="t-${p.key}"></textarea>`;
+    f.querySelector('label').textContent=p.label;
+    f.querySelector('.q').textContent=p.q;
+    const ta=f.querySelector('textarea');
+    ta.value=vals[p.key]||'';
+    ta.oninput=()=>{vals[p.key]=ta.value; update()};
+    f.querySelector('button').onclick=()=>{ta.value=CASES[current].ex[p.key]; vals[p.key]=ta.value; update()};
+    $('fields').appendChild(f);
+  });
+}
+
+function load(){
+  renderTabs();
+  $('vague').textContent='"'+CASES[current].vague+'"';
+  PARTS.forEach(p=>vals[p.key]='');
+  renderFields();
+  $('model').classList.remove('show');
+  update();
+}
+
+function sentence(p, v){
+  v=v.trim(); if(!v) return '';
+  let s = p.lead && !v.toLowerCase().startsWith(p.lead.trim().toLowerCase()) ? p.lead + v.charAt(0).toLowerCase()+v.slice(1) : v;
+  if(!/[.!?]$/.test(s)) s+='.';
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
+
+function update(){
+  let n=0; const parts=[];
+  PARTS.forEach(p=>{
+    const v=(vals[p.key]||'').trim();
+    const ok=v.length>=10; if(ok) n++;
+    $('f-'+p.key).classList.toggle('filled', ok);
+    const s=sentence(p,v); if(s) parts.push(s);
+  });
+  const out=$('out');
+  if(parts.length){out.textContent=parts.join('\n\n'); out.classList.remove('empty')}
+  else{out.textContent='Start filling in the parts on the left. Your brief builds here.'; out.classList.add('empty')}
+  [...$('bars').children].forEach((b,i)=>b.classList.toggle('on', i<n));
+  $('bars').classList.toggle('full', n===5);
+  const labels=["Still vague","Still vague","Getting there","Getting there","Almost ready","Ready to delegate"];
+  $('meterLabel').textContent=labels[n];
+  const missing=PARTS.filter(p=>(vals[p.key]||'').trim().length<10).map(p=>p.label.toLowerCase());
+  $('meterHint').textContent = missing.length ? 'Still missing: '+missing.join(', ')+'.' : 'All five parts covered. Try it in Cowork and compare the plan.';
+}
+
+$('copy').onclick=async()=>{
+  const txt=$('out').classList.contains('empty')?'':$('out').textContent;
+  if(!txt){$('toast').textContent='Nothing to copy yet.';return}
+  try{await navigator.clipboard.writeText(txt); $('toast').textContent='Prompt copied.'}
+  catch(e){
+    const r=document.createRange(); r.selectNodeContents($('out'));
+    const s=getSelection(); s.removeAllRanges(); s.addRange(r);
+    $('toast').textContent='Text selected. Press Ctrl+C to copy.';
+  }
+  setTimeout(()=>$('toast').textContent='',3000);
+};
+$('showModel').onclick=()=>{
+  const c=CASES[current];
+  $('modelText').textContent=PARTS.map(p=>sentence(p,c.ex[p.key])).join(' ');
+  $('modelWhy').innerHTML='';
+  c.why.forEach(w=>{const li=document.createElement('li');li.textContent=w;$('modelWhy').appendChild(li)});
+  $('model').classList.add('show');
+};
+$('clear').onclick=()=>{PARTS.forEach(p=>vals[p.key]=''); renderFields(); $('model').classList.remove('show'); update()};
+
+// breakout timer
+let remaining=300, tick=null;
+function showClock(){const m=Math.floor(remaining/60), s=remaining%60; $('clock').textContent=m+':'+String(s).padStart(2,'0'); $('clock').classList.toggle('done',remaining===0)}
+$('timerBtn').onclick=()=>{
+  if(tick){clearInterval(tick); tick=null; $('timerBtn').textContent='Resume timer'; return}
+  if(remaining===0) remaining=300;
+  $('timerBtn').textContent='Pause timer';
+  tick=setInterval(()=>{remaining--; showClock(); if(remaining<=0){clearInterval(tick); tick=null; $('timerBtn').textContent='Restart timer'}},1000);
+};
+showClock();
+load();
+</script>
+</body>
+</html>
