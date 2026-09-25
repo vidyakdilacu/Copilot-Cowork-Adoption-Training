@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chat or Cowork? Sort the tasks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1F2A4D; --orange:#B5520F; --paper:#F6F8FB; --panel:#EEF2F8; --card:#FFFFFF;
+  --ink:#1F2A4D; --muted:#5A6480; --line:#D4DBE8; --good:#1E7A4F; --good-bg:#E4F4EC;
+  --bad:#B42318; --bad-bg:#FDECEA; --chat:#2F5DA8; --cowork:#B5520F; --sel:#FFB35C;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#121827; --panel:#1B2338; --card:#232C45; --ink:#E8ECF5; --muted:#A3ADC6;
+    --line:#34405F; --good:#5FD39A; --good-bg:#16352A; --bad:#FF8A7A; --bad-bg:#3D1D1D;
+    --chat:#7FA6EE; --cowork:#F08A45; --navy:#E8ECF5;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#121827; --panel:#1B2338; --card:#232C45; --ink:#E8ECF5; --muted:#A3ADC6;
+  --line:#34405F; --good:#5FD39A; --good-bg:#16352A; --bad:#FF8A7A; --bad-bg:#3D1D1D;
+  --chat:#7FA6EE; --cowork:#F08A45; --navy:#E8ECF5;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
+  font-family:Figtree,"Segoe UI",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 24px 40px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+h1{margin:0;font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.02em;color:var(--navy)}
+.lede{margin:6px 0 0;color:var(--muted);max-width:62ch}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+button{font:inherit;font-weight:600;border-radius:8px;padding:10px 16px;cursor:pointer;border:2px solid var(--navy);background:transparent;color:var(--navy)}
+button.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+button:focus-visible,.card:focus-visible{outline:3px solid var(--sel);outline-offset:2px}
+.pool{background:var(--panel);border-radius:14px;padding:16px;min-height:96px;margin-bottom:18px}
+.pool h2,.zone h2{margin:0 0 10px;font-size:15px;font-weight:700;color:var(--muted)}
+.list{display:flex;flex-wrap:wrap;gap:10px;min-height:56px;align-content:flex-start}
+.zones{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.zones{grid-template-columns:1fr}}
+.zone{border-radius:14px;padding:18px;min-height:280px;border:2px dashed var(--line);background:var(--card);transition:border-color .15s,background .15s}
+.zone.over,.zone.target{border-style:solid}
+.zone[data-zone="chat"].over,.zone[data-zone="chat"].target{border-color:var(--chat)}
+.zone[data-zone="cowork"].over,.zone[data-zone="cowork"].target{border-color:var(--cowork)}
+.zone-title{font-size:26px;font-weight:800;margin:0;letter-spacing:-.01em}
+.zone[data-zone="chat"] .zone-title{color:var(--chat)}
+.zone[data-zone="cowork"] .zone-title{color:var(--cowork)}
+.zone-sub{margin:2px 0 14px;color:var(--muted);font-size:15px}
+.zone .list{flex-direction:column;flex-wrap:nowrap}
+.card{background:var(--card);border:1.5px solid var(--line);border-left:5px solid var(--navy);border-radius:10px;
+  padding:10px 12px;max-width:340px;cursor:grab;user-select:none;touch-action:none;font-weight:500;font-size:15px}
+.zone .card{max-width:none}
+.card.selected{border-color:var(--sel);box-shadow:0 0 0 3px var(--sel)}
+.card.correct{border-color:var(--good);border-left-color:var(--good);background:var(--good-bg)}
+.card.wrong{border-color:var(--bad);border-left-color:var(--bad);background:var(--bad-bg)}
+.why{display:none;margin-top:6px;font-size:14px;font-weight:400;color:var(--ink)}
+.card.correct .why,.card.wrong .why{display:block}
+.verdict{font-weight:700}
+.card.correct .verdict{color:var(--good)} .card.wrong .verdict{color:var(--bad)}
+.discuss{display:inline-block;margin-left:6px;font-size:12px;font-weight:700;color:#fff;background:var(--orange);border-radius:999px;padding:1px 8px;vertical-align:1px}
+.ghost{position:fixed;pointer-events:none;z-index:50;opacity:.92;transform:rotate(-2deg);box-shadow:0 12px 28px rgba(31,42,77,.25);max-width:320px}
+.placeholder{opacity:.35}
+.score{font-size:18px;font-weight:700;margin:18px 0 0;min-height:1.4em}
+.rule{display:none;margin-top:14px;display:none;grid-template-columns:1fr 1fr;gap:18px}
+.rule.show{display:grid}
+@media (max-width:760px){.rule.show{grid-template-columns:1fr}}
+.rule div{background:var(--panel);border-radius:12px;padding:14px 16px}
+.rule strong{display:block;font-size:17px;margin-bottom:2px}
+.hint{color:var(--muted);font-size:14px;margin-top:10px}
+@media (prefers-reduced-motion:reduce){.zone{transition:none}.ghost{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Chat or Cowork?</h1>
+      <p class="lede">Drag each task to the tool you'd use for it. When everything is sorted, reveal the answers and talk through the ones the room disagreed on.</p>
+    </div>
+    <div class="actions">
+      <button class="primary" id="reveal">Reveal answers</button>
+      <button id="shuffle">Shuffle</button>
+      <button id="reset">Reset</button>
+    </div>
+  </header>
+
+  <section class="pool" data-zone="pool">
+    <h2>Tasks to sort</h2>
+    <div class="list" id="pool"></div>
+  </section>
+
+  <div class="zones">
+    <section class="zone" data-zone="chat">
+      <p class="zone-title">Copilot Chat</p>
+      <p class="zone-sub">Ask a question, get an answer or draft to use right away</p>
+      <div class="list"></div>
+    </section>
+    <section class="zone" data-zone="cowork">
+      <p class="zone-title">Copilot Cowork</p>
+      <p class="zone-sub">Hand off an outcome that takes several steps and ends in a deliverable</p>
+      <div class="list"></div>
+    </section>
+  </div>
+
+  <p class="score" id="score" aria-live="polite"></p>
+  <div class="rule" id="rule">
+    <div><strong>Reach for Chat when</strong>you need one answer, summary or draft from what's in front of you, and you'll use it straight away.</div>
+    <div><strong>Reach for Cowork when</strong>the job has several steps, pulls from more than one place, and should end in a document, deck, tracker or set of messages you review.</div>
+  </div>
+  <p class="hint">Tip: you can also click a task and then click a column. With the keyboard, focus a task and press 1 for Chat, 2 for Cowork or 0 to send it back.</p>
+</div>
+
+<script>
+const TASKS = [
+  {t:"Summarize a 40-message email thread about a customer RMA", a:"chat", why:"One source, one quick summary you read and act on yourself."},
+  {t:"Rewrite a product brief paragraph for a non-technical audience", a:"chat", why:"A single edit to text you already have."},
+  {t:"Explain what ASIL-D means in ISO 26262, in plain language", a:"chat", why:"A knowledge question. No files to gather, no steps to run."},
+  {t:"Draft a quick reply to a distributor asking for a lead-time update", a:"chat", why:"One short draft that you check and send yourself."},
+  {t:"Prep me for Thursday's customer QBR: pull recent emails, meeting notes and open actions into a briefing doc", a:"cowork", why:"Gathers from several sources and produces a finished document."},
+  {t:"Every Friday, compile program status from Teams channel updates and the Excel tracker into a status report", a:"cowork", why:"Multi-source and repeated weekly with the same steps, which also makes it a strong candidate for a reusable skill."},
+  {t:"Research competitor MCU launches this quarter, compare them with our roadmap sheet and build a comparison deck", a:"cowork", why:"Research, analysis and a deck: several steps with a file as the output."},
+  {t:"Find every open action from last week's design review, build a tracker and draft follow-ups to each owner", a:"cowork", why:"Works through many items, creates a tracker and drafts messages, with a checkpoint before anything goes out."},
+  {t:"Chart the wafer yield trend from one Excel sheet", a:"chat", debate:true, why:"Copilot in Excel handles a single sheet well. It becomes a Cowork job once it spans several files or needs to end in a report."},
+  {t:"Find a date for a 12-person offsite, draft the agenda and send the invites", a:"cowork", debate:true, why:"Multi-step across calendar and email. But should it send invites on your behalf, or stop for your approval first? A good lead-in to accountability in S6."}
+];
+
+const poolList = document.getElementById('pool');
+const zones = [...document.querySelectorAll('[data-zone]')];
+const listFor = z => z.dataset.zone === 'pool' ? poolList : z.querySelector('.list');
+let selected = null, revealed = false;
+
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+
+function makeCard(task, i){
+  const el = document.createElement('div');
+  el.className = 'card'; el.tabIndex = 0; el.dataset.answer = task.a; el.dataset.id = i;
+  el.setAttribute('role','button');
+  el.innerHTML = `<span class="txt"></span><div class="why"><span class="verdict"></span> ${task.why}</div>`;
+  el.querySelector('.txt').textContent = task.t;
+  if(task.debate){const d=document.createElement('span');d.className='discuss';d.textContent='Discuss';d.style.display='none';el.querySelector('.txt').after(d)}
+  attach(el);
+  return el;
+}
+
+function build(order){
+  zones.forEach(z => listFor(z).innerHTML = '');
+  order.forEach(i => poolList.appendChild(makeCard(TASKS[i], i)));
+  clearReveal();
+}
+
+function clearReveal(){
+  revealed = false;
+  document.querySelectorAll('.card').forEach(c => {c.classList.remove('correct','wrong'); const d=c.querySelector('.discuss'); if(d) d.style.display='none'});
+  document.getElementById('score').textContent = '';
+  document.getElementById('rule').classList.remove('show');
+}
+
+function place(card, zoneName){
+  const z = zones.find(z => z.dataset.zone === zoneName);
+  listFor(z).appendChild(card);
+  card.classList.remove('correct','wrong');
+  if(revealed) reveal();
+  deselect();
+}
+
+function select(card){deselect(); selected = card; card.classList.add('selected'); zones.forEach(z => z.dataset.zone!=='pool' && z.classList.add('target'))}
+function deselect(){if(selected) selected.classList.remove('selected'); selected = null; zones.forEach(z => z.classList.remove('target'))}
+
+function attach(card){
+  let start=null, ghost=null, overZone=null;
+  card.addEventListener('pointerdown', e => {
+    if(e.button!==0) return;
+    start = {x:e.clientX, y:e.clientY}; card.setPointerCapture(e.pointerId);
+  });
+  card.addEventListener('pointermove', e => {
+    if(!start) return;
+    if(!ghost && Math.hypot(e.clientX-start.x, e.clientY-start.y) > 6){
+      deselect();
+      ghost = card.cloneNode(true); ghost.classList.add('ghost'); ghost.style.width = card.offsetWidth+'px';
+      document.body.appendChild(ghost); card.classList.add('placeholder');
+    }
+    if(ghost){
+      ghost.style.left = (e.clientX - 20)+'px'; ghost.style.top = (e.clientY - 20)+'px';
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const z = under && under.closest('[data-zone]');
+      if(overZone && overZone!==z) overZone.classList.remove('over');
+      if(z && z.dataset.zone!=='pool') z.classList.add('over');
+      overZone = z;
+    }
+  });
+  const end = e => {
+    if(!start) return;
+    if(ghost){
+      ghost.remove(); ghost=null; card.classList.remove('placeholder');
+      if(overZone){overZone.classList.remove('over'); place(card, overZone.dataset.zone)}
+      overZone=null;
+    } else {
+      selected===card ? deselect() : select(card);
+    }
+    start=null;
+  };
+  card.addEventListener('pointerup', end);
+  card.addEventListener('pointercancel', () => {if(ghost){ghost.remove();ghost=null;card.classList.remove('placeholder')} start=null});
+  card.addEventListener('keydown', e => {
+    const map = {'1':'chat','2':'cowork','0':'pool'};
+    if(map[e.key]){place(card, map[e.key]); card.focus()}
+    if(e.key==='Enter' || e.key===' '){e.preventDefault(); selected===card ? deselect() : select(card)}
+  });
+}
+
+zones.forEach(z => z.addEventListener('click', e => {
+  if(e.target.closest('.card') || !selected) return;
+  const c = selected; place(c, z.dataset.zone); c.focus();
+}));
+
+function reveal(){
+  revealed = true;
+  let placed=0, right=0;
+  document.querySelectorAll('.zone .card').forEach(c => {
+    placed++;
+    const zone = c.closest('[data-zone]').dataset.zone;
+    const ok = zone === c.dataset.answer; if(ok) right++;
+    c.classList.toggle('correct', ok); c.classList.toggle('wrong', !ok);
+    c.querySelector('.verdict').textContent = ok ? 'Right call.' : (c.dataset.answer==='chat' ? 'Better in Chat.' : 'Better in Cowork.');
+    const d = c.querySelector('.discuss'); if(d) d.style.display='inline-block';
+  });
+  const left = TASKS.length - placed;
+  document.getElementById('score').textContent = placed
+    ? `${right} of ${placed} sorted tasks match` + (left ? `, ${left} still to sort.` : '.')
+    : 'Sort some tasks first, then reveal.';
+  if(placed) document.getElementById('rule').classList.add('show');
+}
+
+document.getElementById('reveal').onclick = reveal;
+document.getElementById('reset').onclick = () => build(TASKS.map((_,i)=>i));
+document.getElementById('shuffle').onclick = () => build(shuffle(TASKS.map((_,i)=>i)));
+build(TASKS.map((_,i)=>i));
+</script>
+</body>
+</html>
