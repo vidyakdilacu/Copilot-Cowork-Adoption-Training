@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Predict the plan: how would Cowork tackle it?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1F2A4D; --orange:#B5520F; --paper:#F6F8FB; --panel:#EEF2F8; --card:#FFFFFF;
+  --ink:#1F2A4D; --muted:#5A6480; --line:#D4DBE8; --good:#1E7A4F; --good-bg:#E4F4EC;
+  --bad:#B42318; --bad-bg:#FDECEA; --warn:#8A5A00; --warn-bg:#FFF4DC; --focus:#FFB35C;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#E8ECF5; --paper:#121827; --panel:#1B2338; --card:#232C45; --ink:#E8ECF5; --muted:#A3ADC6;
+    --line:#34405F; --good:#5FD39A; --good-bg:#16352A; --bad:#FF8A7A; --bad-bg:#3D1D1D;
+    --warn:#F5C26B; --warn-bg:#3A2E14; --orange:#F08A45;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#E8ECF5; --paper:#121827; --panel:#1B2338; --card:#232C45; --ink:#E8ECF5; --muted:#A3ADC6;
+  --line:#34405F; --good:#5FD39A; --good-bg:#16352A; --bad:#FF8A7A; --bad-bg:#3D1D1D;
+  --warn:#F5C26B; --warn-bg:#3A2E14; --orange:#F08A45;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
+  font-family:Figtree,"Segoe UI",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 24px 48px}
+h1{margin:0;font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.02em;color:var(--navy)}
+.lede{margin:6px 0 20px;color:var(--muted);max-width:66ch}
+button{font:inherit;font-weight:600;border-radius:8px;padding:9px 15px;cursor:pointer;border:2px solid var(--navy);background:transparent;color:var(--navy)}
+button.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tab{border-width:1.5px;border-color:var(--line);color:var(--muted);background:var(--card)}
+.tab[aria-selected="true"]{border-color:var(--navy);background:var(--navy);color:var(--paper)}
+.request{background:var(--card);border-left:6px solid var(--orange);border-radius:12px;padding:18px 20px;margin-bottom:20px}
+.request p{margin:0;font-size:clamp(18px,2.2vw,22px);font-weight:600}
+.request small{display:block;color:var(--muted);margin-bottom:6px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);border-radius:14px;padding:16px 18px}
+.panel h2{margin:0 0 4px;font-size:18px}
+.panel .sub{margin:0 0 12px;color:var(--muted);font-size:14px}
+.bank{display:flex;flex-direction:column;gap:8px}
+.step{display:flex;align-items:center;gap:10px;text-align:left;width:100%;background:var(--card);border:1.5px solid var(--line);
+  color:var(--ink);font-weight:500;padding:10px 12px}
+.step .plus{font-weight:800;color:var(--orange);font-size:18px;line-height:1}
+.step.used{opacity:.35}
+ol.plan{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;min-height:120px}
+ol.plan li{display:flex;align-items:flex-start;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px 10px 10px 12px}
+.num{flex:none;width:26px;height:26px;border-radius:50%;background:var(--navy);color:var(--paper);display:grid;place-items:center;font-size:13px;font-weight:700;margin-top:1px}
+.li-body{flex:1}
+.li-note{display:none;font-size:14px;margin-top:4px}
+.ctrls{display:flex;gap:4px;flex:none}
+.ctrls button{padding:2px 8px;border-width:1.5px;font-size:14px;border-color:var(--line);color:var(--muted)}
+ol.plan li.hit{border-color:var(--good);background:var(--good-bg)}
+ol.plan li.miss{border-color:var(--bad);background:var(--bad-bg)}
+ol.plan li.hit .li-note,ol.plan li.miss .li-note{display:block}
+ol.plan li.hit .num{background:var(--good)} ol.plan li.miss .num{background:var(--bad)}
+.empty{color:var(--muted);font-size:15px;padding:18px 4px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.result{display:none;margin-top:24px}
+.result.show{display:block}
+.score{font-size:20px;font-weight:700;margin:0 0 14px}
+.ref ol{margin:0;padding-left:22px}
+.ref li{margin:6px 0}
+.ref li.missed{color:var(--bad);font-weight:600}
+.checkpoint{display:inline-block;font-size:12px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:999px;padding:1px 8px;margin-left:6px}
+.better{margin-top:20px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px 18px}
+.better h3{margin:0 0 8px;font-size:17px}
+.better blockquote{margin:0 0 10px;padding:12px 14px;background:var(--panel);border-radius:10px;font-weight:500}
+.better ul{margin:0;padding-left:20px;color:var(--muted);font-size:15px}
+.note{color:var(--muted);font-size:14px;margin-top:18px;max-width:80ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Predict the plan</h1>
+  <p class="lede">Read the request, then build the plan you think Cowork will propose: pick the steps it should take and put them in order. Leave out anything Cowork shouldn't do on its own. Then compare with the reference plan and the live run.</p>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+
+  <div class="request"><small>The request</small><p id="req"></p></div>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>Possible steps</h2>
+      <p class="sub">Click a step to add it to your plan. Not all of them belong.</p>
+      <div class="bank" id="bank"></div>
+    </section>
+    <section class="panel">
+      <h2>Your predicted plan</h2>
+      <p class="sub">Use the arrows to reorder, or × to remove a step.</p>
+      <ol class="plan" id="plan"></ol>
+      <div class="bar">
+        <button class="primary" id="compare">Compare with reference plan</button>
+        <button id="reset">Start over</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="score" id="score"></p>
+    <div class="grid">
+      <div class="panel ref">
+        <h2>Reference plan</h2>
+        <p class="sub">A typical plan for this request. Missed steps are highlighted.</p>
+        <ol id="refList"></ol>
+      </div>
+      <div class="better">
+        <h3>Make the request steer the plan</h3>
+        <blockquote id="betterPrompt"></blockquote>
+        <ul id="betterWhy"></ul>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">The reference plan shows a typical approach. The plan Cowork proposes in the live demo may use different wording, merge steps or change the order, so compare the thinking rather than the exact words.</p>
+</div>
+
+<script>
+const CASES = [
+ {name:"Customer QBR prep",
+  req:"Prepare me for Thursday's QBR with our automotive customer.",
+  steps:[
+   {t:"Search recent email threads with the customer", ok:true},
+   {t:"Pull notes and decisions from recent meetings with them", ok:true},
+   {t:"Check open action items and who owns them", ok:true},
+   {t:"Draft a briefing doc with account summary, open issues and talking points", ok:true},
+   {t:"Share the draft with you for review before it's final", ok:true, cp:true},
+   {t:"Send the briefing to the customer's contacts", ok:false, why:"Sending anything external wasn't asked for, and it should never happen without your approval."},
+   {t:"Book a prep meeting with the whole account team", ok:false, why:"Not part of the request. Cowork should stick to the outcome you asked for."},
+   {t:"Update the pricing in the customer's quote", ok:false, why:"Out of scope, and a business decision that stays with you."}
+  ],
+  better:"Prepare a 2-page briefing for Thursday's QBR with [customer]. Use my emails and Teams meeting notes with them from the last 60 days, plus the open-actions tracker in [file]. Include an account summary, open issues with owners and 5 talking points. Save it as a Word doc and check with me before sharing it with anyone.",
+  why:["Names the sources and time window, so Cowork doesn't guess where to look.","Defines the output: length, sections and format.","Sets the checkpoint explicitly."]},
+ {name:"Weekly status report",
+  req:"Put together this week's program status report.",
+  steps:[
+   {t:"Read this week's updates in the program's Teams channel", ok:true},
+   {t:"Open the Excel tracker and pick up milestone and risk changes", ok:true},
+   {t:"Compare with last week's report to see what changed", ok:true},
+   {t:"Draft the report in the usual format", ok:true},
+   {t:"Flag red risks or judgment calls for your review", ok:true, cp:true},
+   {t:"Post the report to the channel automatically", ok:false, why:"Publishing should wait until you've reviewed it."},
+   {t:"Change the risk ratings in the tracker itself", ok:false, why:"Editing the source of truth goes beyond reporting on it, and the ratings are the owners' call."}
+  ],
+  better:"Draft this week's status report for [program]. Use this week's posts in the [channel] Teams channel and the milestone and risk tabs in [tracker]. Follow the format of last week's report in [file], highlight what changed since then, and list any red risks separately for me to review before I send it.",
+  why:["Points to last week's report as a format and baseline.","Tells Cowork what to surface for your judgment.","Because it repeats weekly, this is a good candidate for a reusable skill (S4)."]},
+ {name:"Design review follow-ups",
+  req:"Follow up on the actions from last week's design review.",
+  steps:[
+   {t:"Find the design review recap, transcript or notes", ok:true},
+   {t:"Extract action items with owners and due dates", ok:true},
+   {t:"Build a tracker listing every action", ok:true},
+   {t:"Draft a follow-up message to each owner", ok:true},
+   {t:"Hold the drafts for your approval before sending", ok:true, cp:true},
+   {t:"Send all follow-ups straight away", ok:false, why:"Messages to colleagues on your behalf should wait for your approval."},
+   {t:"Reassign overdue actions to new owners", ok:false, why:"Reassigning work is a people decision, not something to delegate to an assistant."}
+  ],
+  better:"From last Tuesday's [project] design review, list every action item with owner and due date in an Excel tracker. Then draft a short, friendly follow-up to each owner asking for a status update by Friday. Don't send anything until I've reviewed the drafts.",
+  why:["Pins down which meeting, so Cowork finds the right recap.","States the tone and ask for the follow-ups.","Makes the no-send-without-review rule explicit."]},
+ {name:"Competitor research deck",
+  req:"Build me a deck comparing competitor MCU launches with our roadmap.",
+  steps:[
+   {t:"Search the web for competitor MCU announcements this quarter", ok:true},
+   {t:"Open our roadmap spreadsheet", ok:true},
+   {t:"Build a comparison of features, timing and target markets", ok:true},
+   {t:"Draft slides with sources cited", ok:true},
+   {t:"Flag assumptions and gaps for you to check", ok:true, cp:true},
+   {t:"Share the deck with the whole sales org", ok:false, why:"Distribution is your decision once you've checked the content."},
+   {t:"Fill missing specs with estimates without saying so", ok:false, why:"Unflagged guesses undermine trust. Gaps should be marked, not quietly filled."}
+  ],
+  better:"Research MCU launches announced by [competitors] since July. Compare them with our roadmap in [file] on core, memory, target market and availability date. Build a 6–8 slide deck with a comparison table and cite the source for every claim. Mark anything you couldn't verify, and check with me before finalizing.",
+  why:["Narrows the competitors and time window.","Sets the comparison criteria and deck length.","Asks for sources and flagged gaps, which keeps the human accountable for accuracy."]}
+];
+
+let current = 0, plan = [], bankOrder = [];
+const $ = id => document.getElementById(id);
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function renderTabs(){
+  $('tabs').innerHTML='';
+  CASES.forEach((c,i)=>{
+    const b=document.createElement('button');
+    b.className='tab'; b.setAttribute('role','tab'); b.textContent=c.name;
+    b.setAttribute('aria-selected', i===current);
+    b.onclick=()=>{current=i; load()};
+    $('tabs').appendChild(b);
+  });
+}
+
+function load(){
+  renderTabs();
+  const c=CASES[current];
+  $('req').textContent='"'+c.req+'"';
+  plan=[]; bankOrder=shuffle(c.steps.map((_,i)=>i));
+  $('result').classList.remove('show');
+  render();
+}
+
+function render(){
+  const c=CASES[current];
+  $('bank').innerHTML='';
+  bankOrder.forEach(i=>{
+    const b=document.createElement('button');
+    b.className='step'+(plan.includes(i)?' used':'');
+    b.innerHTML='<span class="plus">+</span><span></span>';
+    b.lastChild.textContent=c.steps[i].t;
+    b.disabled=plan.includes(i);
+    b.onclick=()=>{plan.push(i); clearResult(); render()};
+    $('bank').appendChild(b);
+  });
+  $('plan').innerHTML='';
+  if(!plan.length){$('plan').innerHTML='<li class="empty" style="border:none;background:none">Your plan is empty. Add steps from the left.</li>'}
+  plan.forEach((i,pos)=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<span class="num">${pos+1}</span><div class="li-body"><span class="t"></span><div class="li-note"></div></div>
+      <span class="ctrls"><button aria-label="Move up">↑</button><button aria-label="Move down">↓</button><button aria-label="Remove">×</button></span>`;
+    li.querySelector('.t').textContent=c.steps[i].t;
+    const [up,down,rm]=li.querySelectorAll('.ctrls button');
+    up.disabled=pos===0; down.disabled=pos===plan.length-1;
+    up.onclick=()=>{[plan[pos-1],plan[pos]]=[plan[pos],plan[pos-1]]; clearResult(); render()};
+    down.onclick=()=>{[plan[pos+1],plan[pos]]=[plan[pos],plan[pos+1]]; clearResult(); render()};
+    rm.onclick=()=>{plan.splice(pos,1); clearResult(); render()};
+    li.dataset.idx=i;
+    $('plan').appendChild(li);
+  });
+  $('compare').disabled=!plan.length;
+}
+
+function clearResult(){$('result').classList.remove('show')}
+
+function compare(){
+  const c=CASES[current];
+  const realIdx=c.steps.map((s,i)=>s.ok?i:-1).filter(i=>i>=0);
+  let found=0, extras=0;
+  document.querySelectorAll('#plan li[data-idx]').forEach(li=>{
+    const s=c.steps[+li.dataset.idx];
+    const note=li.querySelector('.li-note');
+    li.classList.remove('hit','miss');
+    if(s.ok){found++; li.classList.add('hit'); note.textContent=s.cp?'In the plan. This is the checkpoint where you stay in control.':'In the plan.'}
+    else{extras++; li.classList.add('miss'); note.textContent='Not in the plan. '+s.why}
+  });
+  // order check: are chosen real steps in reference order?
+  const chosenReal=plan.filter(i=>c.steps[i].ok);
+  let inOrder=true; for(let k=1;k<chosenReal.length;k++) if(chosenReal[k]<chosenReal[k-1]) inOrder=false;
+  let msg=`You found ${found} of ${realIdx.length} steps`;
+  msg+= extras ? `, and included ${extras} step${extras>1?'s':''} Cowork shouldn't take on its own.` : ', with no steps Cowork shouldn\'t take.';
+  if(chosenReal.length>1) msg+= inOrder ? ' Your order matches.' : ' Some steps are in a different order, which is worth discussing.';
+  $('score').textContent=msg;
+
+  $('refList').innerHTML='';
+  realIdx.forEach(i=>{
+    const li=document.createElement('li');
+    li.textContent=c.steps[i].t;
+    if(c.steps[i].cp){const s=document.createElement('span');s.className='checkpoint';s.textContent='Checkpoint';li.appendChild(s)}
+    if(!plan.includes(i)) li.classList.add('missed');
+    $('refList').appendChild(li);
+  });
+  $('betterPrompt').textContent=c.better;
+  $('betterWhy').innerHTML='';
+  c.why.forEach(w=>{const li=document.createElement('li');li.textContent=w;$('betterWhy').appendChild(li)});
+  $('result').classList.add('show');
+  $('result').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth', block:'start'});
+}
+
+$('compare').onclick=compare;
+$('reset').onclick=()=>{plan=[]; clearResult(); render()};
+load();
+</script>
+</body>
+</html>
