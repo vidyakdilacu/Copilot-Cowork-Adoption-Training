@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Opportunity scorecard: score it before you scope it</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1F2A4D; --head:#1F2A60; --orange:#B5520F; --paper:#F6F8FB; --panel:#EEF2F8; --card:#FFFFFF;
+  --ink:#1F2A4D; --muted:#5A6480; --line:#D4DBE8; --good:#1E7A4F; --good-bg:#E4F4EC;
+  --park:#8A5A00; --park-bg:#FFF4DC; --sel-bg:#1F2A60; --sel-ink:#FFFFFF; --focus:#FFB35C;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --navy:#E8ECF5; --head:#2E3B66; --paper:#121827; --panel:#1B2338; --card:#232C45; --ink:#E8ECF5; --muted:#A3ADC6;
+    --line:#34405F; --good:#5FD39A; --good-bg:#16352A; --park:#F5C26B; --park-bg:#3A2E14; --orange:#F08A45;
+    --sel-bg:#F08A45; --sel-ink:#121827;
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#E8ECF5; --head:#2E3B66; --paper:#121827; --panel:#1B2338; --card:#232C45; --ink:#E8ECF5; --muted:#A3ADC6;
+  --line:#34405F; --good:#5FD39A; --good-bg:#16352A; --park:#F5C26B; --park-bg:#3A2E14; --orange:#F08A45;
+  --sel-bg:#F08A45; --sel-ink:#121827;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);
+  font-family:Figtree,"Segoe UI",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:1160px;margin:0 auto;padding:28px 24px 48px}
+.eyebrow{margin:0;font-size:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--orange)}
+h1{margin:2px 0 0;font-size:clamp(28px,4vw,42px);font-weight:800;letter-spacing:-.02em;color:var(--navy)}
+.lede{margin:6px 0 20px;color:var(--muted);max-width:70ch}
+button{font:inherit;font-weight:600;border-radius:8px;padding:9px 15px;cursor:pointer;border:2px solid var(--navy);background:transparent;color:var(--navy)}
+button.primary{background:var(--orange);border-color:var(--orange);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,input:focus-visible,.cell:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.top{display:grid;grid-template-columns:1fr;gap:16px;align-items:end;margin-bottom:16px}
+@media (max-width:760px){.top{grid-template-columns:1fr}}
+.name label{display:block;font-weight:700;margin-bottom:4px}
+.name input{width:100%;font:inherit;font-size:18px;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.samples{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.samples span{color:var(--muted);font-size:14px}
+.samples button{padding:6px 12px;font-size:14px;border-width:1.5px;border-color:var(--line);color:var(--muted);background:var(--card)}
+.desc{display:none;background:var(--card);border-left:6px solid var(--orange);border-radius:10px;padding:12px 16px;margin-bottom:16px}
+.desc.show{display:block}
+.table-wrap{overflow-x:auto;border-radius:12px}
+table{width:100%;border-collapse:separate;border-spacing:3px;min-width:680px}
+th{background:var(--head);color:#fff;text-align:center;padding:14px 10px;font-size:17px;font-weight:700;border-radius:6px}
+th:first-child{text-align:left}
+td.dim{background:var(--panel);font-weight:700;font-size:17px;padding:12px 14px;border-radius:6px;width:20%}
+td.dim small{display:block;font-weight:500;font-size:13px;color:var(--muted)}
+.cell{background:var(--panel);text-align:center;padding:14px 10px;font-size:16px;cursor:pointer;border-radius:6px;border:2px solid transparent;user-select:none;transition:background .12s}
+.cell:hover{border-color:var(--line)}
+.cell[aria-checked="true"]{background:var(--sel-bg);color:var(--sel-ink);font-weight:700}
+.cell .pts{display:block;font-size:12px;opacity:.7;margin-top:2px}
+.summary{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;margin-top:20px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px 20px}
+@media (max-width:640px){.summary{grid-template-columns:1fr}}
+.total{font-size:56px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.total small{font-size:22px;color:var(--muted);font-weight:600}
+.verdict{display:inline-block;font-weight:800;font-size:18px;border-radius:8px;padding:4px 12px;margin-bottom:6px}
+.verdict.go{background:var(--good-bg);color:var(--good)}
+.verdict.park{background:var(--park-bg);color:var(--park)}
+.verdict.wait{background:var(--panel);color:var(--muted)}
+.tips{margin:4px 0 0;padding-left:20px;font-size:15px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.reviewing{margin:10px 0 0;font-weight:600;color:var(--orange);min-height:0}
+.reviewing:empty{display:none}
+.sl tr.active td{border-color:var(--orange);background:var(--panel)}
+.sl .rv{padding:2px 10px;font-size:14px;border-width:1.5px;margin-right:6px}
+.shortlist{margin-top:28px}
+.shortlist h2{margin:0 0 8px;font-size:20px}
+.sl-empty{color:var(--muted)}
+.sl table{min-width:0;border-spacing:0 6px}
+.sl td{background:var(--card);padding:10px 12px;border-top:1.5px solid var(--line);border-bottom:1.5px solid var(--line)}
+.sl td:first-child{border-left:1.5px solid var(--line);border-radius:8px 0 0 8px;font-weight:700}
+.sl td:last-child{border-right:1.5px solid var(--line);border-radius:0 8px 8px 0;text-align:right}
+.sl .chip{font-size:13px;font-weight:700;border-radius:999px;padding:2px 10px}
+.sl .rm{padding:2px 9px;font-size:14px;border-width:1.5px;border-color:var(--line);color:var(--muted)}
+.sl .scores{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Where Cowork creates value</p>
+  <h1>Score the opportunity before you scope it</h1>
+  <p class="lede">Type a task you'd like to hand to Cowork and click one score for each dimension, then add it to the list. Use Review on any scored use case to walk through it with the group. 11 or more out of 15 makes it a good first task. Below 11, park it and look for a better one.</p>
+
+  <div class="top">
+    <div class="name">
+      <label for="uc">Your use case</label>
+      <input id="uc" placeholder="e.g. Weekly program status report" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Dimension</th><th>1 · weak</th><th>2 · workable</th><th>3 · strong</th></tr></thead>
+      <tbody id="rubric"></tbody>
+    </table>
+  </div>
+
+  <div class="summary">
+    <div class="total" id="total">0<small> / 15</small></div>
+    <div>
+      <span class="verdict wait" id="verdict">Score all five dimensions</span>
+      <ul class="tips" id="tips"></ul>
+      <p class="reviewing" id="reviewing" aria-live="polite"></p>
+      <div class="bar">
+        <button class="primary" id="add" disabled>Add to list</button>
+        <button id="clear">Clear scores</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="shortlist">
+    <h2>Scored use cases</h2>
+    <div class="sl" id="sl"><p class="sl-empty">Scored use cases appear here, highest first. Click Review to walk through one.</p></div>
+    <div class="bar"><button id="csv" disabled>Download list (CSV)</button></div>
+  </section>
+</div>
+
+<script>
+const DIMS = [
+ {key:"vol", name:"Volume", hint:"How often does it happen?", opts:["Monthly or less","Weekly","Daily or continuous"],
+  tip:"Look for a more frequent version of the task, or group similar tasks that follow the same steps."},
+ {key:"method", name:"Method clarity", hint:"Is the way of doing it written down?", opts:["Tribal knowledge","Documented, some gaps","Written and agreed"],
+  tip:"Write the steps down once with the person who does the task today, and agree them with the owner."},
+ {key:"access", name:"System access", hint:"Can the data and systems be reached?", opts:["No API or owner","API, owner unclear","API, owner, test tenant"],
+  tip:"Identify the system owner, and confirm access and a safe place to test."},
+ {key:"end", name:"End action", hint:"How far does the agent take it?", opts:["Human acts on output","Agent drafts, human sends","Agent completes and logs"],
+  tip:"Define exactly what the agent produces and who reviews or approves it."},
+ {key:"base", name:"Baseline metric", hint:"Can you measure today's effort?", opts:["None","Estimated","Reported today"],
+  tip:"Time the task a few times this week so you have an estimate to compare against."}
+];
+
+const scores = {}; let list = []; let editing = null;
+const $ = id => document.getElementById(id);
+
+function buildRubric(){
+  const tb=$('rubric'); tb.innerHTML='';
+  DIMS.forEach(d=>{
+    const tr=document.createElement('tr'); tr.setAttribute('role','radiogroup'); tr.setAttribute('aria-label',d.name);
+    const th=document.createElement('td'); th.className='dim'; th.innerHTML=`<span></span><small></small>`;
+    th.firstChild.textContent=d.name; th.lastChild.textContent=d.hint; tr.appendChild(th);
+    d.opts.forEach((o,i)=>{
+      const td=document.createElement('td'); td.className='cell'; td.tabIndex=0; td.setAttribute('role','radio');
+      td.dataset.key=d.key; td.dataset.v=i+1;
+      td.innerHTML=`<span></span><span class="pts">${i+1} pt${i?'s':''}</span>`; td.firstChild.textContent=o;
+      const pick=()=>{scores[d.key]=i+1; update()};
+      td.onclick=pick;
+      td.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}};
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+}
+
+function update(){
+  document.querySelectorAll('.cell').forEach(c=>c.setAttribute('aria-checked', scores[c.dataset.key]===+c.dataset.v));
+  const done=DIMS.filter(d=>scores[d.key]).length;
+  const total=DIMS.reduce((a,d)=>a+(scores[d.key]||0),0);
+  $('total').innerHTML=`${total}<small> / 15</small>`;
+  const v=$('verdict'), tips=$('tips'); tips.innerHTML='';
+  if(done<5){v.className='verdict wait'; v.textContent=`Score all five dimensions (${done} of 5 done)`}
+  else if(total>=11){v.className='verdict go'; v.textContent='Good first task. Scope it.'}
+  else{v.className='verdict park'; v.textContent='Park it and find a better first task.'}
+  if(done===5){
+    const low=DIMS.filter(d=>scores[d.key]===1);
+    const weak=low.length?low:DIMS.filter(d=>scores[d.key]===2);
+    weak.slice(0,3).forEach(d=>{const li=document.createElement('li'); li.innerHTML='<strong></strong> '; li.firstChild.textContent=d.name+':'; li.append(d.tip); tips.appendChild(li)});
+  }
+  $('add').disabled = done<5;
+  $('add').textContent = editing!==null ? 'Save changes' : 'Add to list';
+  $('reviewing').textContent = editing!==null ? 'Reviewing: '+editing+'. Change any score and save, or clear to start a new one.' : '';
+}
+
+$('clear').onclick=()=>{DIMS.forEach(d=>delete scores[d.key]); $('uc').value=''; editing=null; update(); renderList()};
+
+$('add').onclick=()=>{
+  const name=$('uc').value.trim()||'Untitled use case';
+  const total=DIMS.reduce((a,d)=>a+scores[d.key],0);
+  if(editing!==null) list=list.filter(x=>x.name!==editing);
+  list=list.filter(x=>x.name!==name);
+  list.push({name, s:{...scores}, total});
+  list.sort((a,b)=>b.total-a.total);
+  editing=null; $('uc').value='';
+  DIMS.forEach(d=>delete scores[d.key]); update(); renderList(); $('uc').focus();
+};
+
+function review(x){
+  editing=x.name; $('uc').value=x.name;
+  DIMS.forEach(d=>scores[d.key]=x.s[d.key]);
+  update(); renderList();
+  $('uc').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth', block:'start'});
+}
+
+function renderList(){
+  const sl=$('sl');
+  if(!list.length){sl.innerHTML='<p class="sl-empty">Scored use cases appear here, highest first. Click Review to walk through one.</p>'; $('csv').disabled=true; return}
+  const t=document.createElement('table'); const tb=document.createElement('tbody'); t.appendChild(tb);
+  list.forEach((x,i)=>{
+    const tr=document.createElement('tr');
+    const go=x.total>=11;
+    tr.innerHTML=`<td></td><td class="scores"></td><td><strong>${x.total}</strong> / 15</td>
+      <td><span class="chip verdict ${go?'go':'park'}">${go?'Scope it':'Park it'}</span></td><td><button class="rv">Review</button><button class="rm" aria-label="Remove">×</button></td>`;
+    if(x.name===editing) tr.classList.add('active');
+    tr.firstChild.textContent=x.name;
+    tr.children[1].textContent=DIMS.map(d=>d.name.split(' ')[0]+' '+x.s[d.key]).join(' · ');
+    tr.querySelector('.rv').onclick=()=>review(x);
+    tr.querySelector('.rm').onclick=()=>{if(x.name===editing){editing=null;$('uc').value='';DIMS.forEach(d=>delete scores[d.key]);update()} list.splice(i,1); renderList()};
+    tb.appendChild(tr);
+  });
+  sl.innerHTML=''; sl.appendChild(t); $('csv').disabled=false;
+}
+
+$('csv').onclick=()=>{
+  const esc=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const rows=[['Use case',...DIMS.map(d=>d.name),'Total','Verdict']];
+  list.forEach(x=>rows.push([x.name,...DIMS.map(d=>x.s[d.key]),x.total,x.total>=11?'Scope it':'Park it']));
+  const blob=new Blob([rows.map(r=>r.map(esc).join(',')).join('\r\n')],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='cowork-opportunity-shortlist.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+};
+
+buildRubric(); update();
+</script>
+</body>
+</html>
