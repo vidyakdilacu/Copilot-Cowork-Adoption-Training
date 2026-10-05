@@ -1,0 +1,1149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Copilot Cowork Lab Manual</title>
+<meta name="description" content="Hands-on Copilot Cowork adoption labs grouped by use case, with role-tailored prompts. Microsoft 365 boundary only.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: white canvas, centered 1120px column; finder flows role → use case → task → prompt */
+:root{
+  --bg:#FFFFFF; --surface:#F8F9FB; --ink:#16181D; --body:#3D424D; --muted:#7A808C;
+  --line:#ECEEF2; --line-strong:#DCE0E6;
+  --accent:#3554C4; --accent-soft:#EEF2FD; --accent-ink:#22398C;
+  --ph-bg:#FFF4D6; --ph-fg:#7A5600;
+  --ok:#1E7A4C; --ok-soft:#E9F6EF; --warn:#9A6200; --warn-soft:#FDF3E1; --crit:#B23A4C; --crit-soft:#FCEDEF;
+  --f-ui:"Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono:"IBM Plex Mono", Consolas, "Courier New", monospace;
+  --r:10px; --shadow:0 1px 2px rgba(22,24,29,.04), 0 4px 16px rgba(22,24,29,.04);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--body);font-family:var(--f-ui);font-size:15.5px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--ink);margin:0;line-height:1.25;text-wrap:balance;font-weight:700;letter-spacing:-.01em}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+[hidden]{display:none!important}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:24px}
+code{font-family:var(--f-mono);font-size:.86em;background:var(--surface);border:1px solid var(--line);padding:1px 5px;border-radius:4px}
+
+/* Top bar */
+.bar{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.88);backdrop-filter:saturate(180%) blur(10px);-webkit-backdrop-filter:saturate(180%) blur(10px);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:24px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-weight:700;font-size:15px;white-space:nowrap}
+.brand:hover{text-decoration:none}
+.mark{width:26px;height:26px;border-radius:7px;background:var(--accent);display:grid;place-items:center}
+.mark svg{width:14px;height:14px}
+.links{display:flex;gap:4px;margin-left:auto}
+.links a{color:var(--muted);font-size:14px;font-weight:500;padding:6px 12px;border-radius:7px}
+.links a:hover{color:var(--ink);background:var(--surface);text-decoration:none}
+.progress{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);white-space:nowrap}
+.pbar{width:72px;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .3s}
+
+/* Hero */
+.hero{padding-block:64px 40px}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--accent-ink);background:var(--accent-soft);padding:5px 12px;border-radius:99px}
+.kicker i{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.hero h1{font-size:clamp(32px,5vw,48px);margin-top:18px;max-width:18ch;letter-spacing:-.025em}
+.hero p{font-size:17px;max-width:60ch;margin:16px 0 0;color:var(--body)}
+.stats{display:flex;flex-wrap:wrap;gap:12px 40px;margin-top:32px;padding-top:24px;border-top:1px solid var(--line)}
+.stat b{display:block;color:var(--ink);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+
+/* Sections */
+section{padding-block:56px}
+section + section{border-top:1px solid var(--line)}
+.sec-head{display:grid;gap:8px;margin-bottom:28px;max-width:66ch}
+.sec-label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.sec-head h2{font-size:28px;letter-spacing:-.02em}
+.sec-head p{margin:0;color:var(--muted)}
+
+/* Finder */
+.finder{display:grid;gap:28px}
+.step-label{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:12px}
+.step-label .n{width:22px;height:22px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.step-label .hint{font-weight:400;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip-btn{border:1px solid var(--line-strong);background:var(--bg);color:var(--body);font-size:14px;font-weight:500;padding:7px 14px;border-radius:99px;transition:border-color .15s,background .15s,color .15s;display:inline-flex;align-items:center;gap:8px}
+.chip-btn:hover{border-color:var(--accent);color:var(--ink)}
+.chip-btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip-btn .c{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.chip-btn[aria-pressed="true"] .c{color:rgba(255,255,255,.7)}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--muted);margin-top:12px;cursor:pointer}
+.toggle input{accent-color:var(--accent);width:15px;height:15px;margin:0}
+
+.tasks{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.task{text-align:left;border:1px solid var(--line-strong);background:var(--bg);border-radius:var(--r);padding:14px 16px;display:grid;gap:8px;align-content:start;transition:border-color .15s,box-shadow .15s}
+.task:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.task[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.task .tid{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.task .tt{font-weight:600;color:var(--ink);font-size:15px;line-height:1.35}
+.task .tm{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.task .ok{font-size:12px;color:var(--ok);font-weight:600}
+
+.tag{display:inline-flex;align-items:center;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--surface);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.tag.w1{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.tag.w2{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.tag.sp{background:var(--crit-soft);color:var(--crit);border-color:transparent}
+.tag.rec{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+
+/* Lab detail */
+.lab{border:1px solid var(--line);border-radius:14px;background:var(--bg);box-shadow:var(--shadow);overflow:hidden}
+.lab-top{padding:24px 26px 20px;display:grid;gap:14px;border-bottom:1px solid var(--line)}
+.lab-crumb{font-size:12.5px;color:var(--muted);font-weight:500}
+.lab-crumb b{font-family:var(--f-mono);font-weight:500;color:var(--accent)}
+.lab h3{font-size:22px;margin-top:4px;letter-spacing:-.015em}
+.lab-tags{display:flex;flex-wrap:wrap;gap:6px}
+.obj{margin:0;max-width:72ch}
+.apps{font-size:13px;color:var(--muted)}
+.apps b{color:var(--body);font-weight:500}
+
+.prompt{background:var(--surface);border-bottom:1px solid var(--line)}
+.prompt-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:12px 26px;border-bottom:1px solid var(--line)}
+.prompt-bar .lg{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.ph{background:var(--ph-bg);color:var(--ph-fg);border-radius:3px;padding:0 3px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--accent);color:#fff;font-size:13.5px;font-weight:600;padding:8px 14px;border-radius:8px;transition:background .15s}
+.btn:hover{background:var(--accent-ink)}
+.btn svg{width:14px;height:14px}
+pre.ptext{margin:0;padding:20px 26px;font-family:var(--f-mono);font-size:13px;line-height:1.7;color:var(--ink);white-space:pre-wrap;word-break:break-word;max-height:460px;overflow:auto}
+
+.lab-body{padding:22px 26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:24px}
+.lab-body h4{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:10px}
+.lab-body ol,.lab-body ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14.5px}
+.lab-body p{margin:0;font-size:14.5px}
+.lab-foot{padding:14px 26px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--bg)}
+.check{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:500;color:var(--ink);cursor:pointer}
+.check input{width:17px;height:17px;accent-color:var(--ok);margin:0}
+.share{font-size:13px;color:var(--muted);background:none;border:0;padding:4px 0}
+.share:hover{color:var(--accent)}
+.empty{border:1px dashed var(--line-strong);border-radius:var(--r);padding:28px;color:var(--muted);text-align:center}
+
+/* Guide */
+.guide{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;background:var(--bg);min-width:0}
+.card.wide{grid-column:1/-1}
+.card h3{font-size:17px;margin-bottom:10px}
+.card p{margin:8px 0}
+.card ul,.card ol{margin:8px 0 0;padding-left:20px;display:grid;gap:6px}
+.scope{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:6px}
+.scope h4{font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dot{width:8px;height:8px;border-radius:50%}
+.note{margin-top:18px;background:var(--surface);border-radius:8px;padding:16px 18px;font-size:14.5px}
+.note b{color:var(--ink)}
+.note ul{margin-top:6px}
+
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:620px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--surface)}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;color:var(--ink)}
+
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:4px}
+.rule{padding:16px 0 0;border-top:2px solid var(--ink)}
+.rule h4{font-size:15px;margin-bottom:6px}
+.rule p{margin:0;font-size:14.5px}
+
+/* Library */
+.lib-tools{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:24px}
+.search{flex:1 1 260px;position:relative}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted)}
+.search input{width:100%;font:inherit;font-size:14.5px;padding:10px 12px 10px 36px;border:1px solid var(--line-strong);border-radius:8px;background:var(--bg);color:var(--ink)}
+.search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.group{margin-top:28px}
+.group:first-child{margin-top:0}
+.group-head{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.group-head h3{font-size:17px}
+.group-head span{font-size:13px;color:var(--muted)}
+.group > p{margin:0 0 10px;color:var(--muted);font-size:14.5px}
+.row{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 12px;border-top:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;border-radius:0;transition:background .15s}
+.row:hover{background:var(--surface)}
+.group .row:last-of-type{border-bottom:1px solid var(--line)}
+.row .rid{font-family:var(--f-mono);font-size:12.5px;color:var(--muted)}
+.row .rt{font-weight:600;color:var(--ink);font-size:15px}
+.row .rt small{display:block;font-weight:400;color:var(--muted);font-size:13.5px;margin-top:2px}
+.row .rm{display:flex;gap:6px;align-items:center}
+.noresults{color:var(--muted);padding:20px 0}
+
+/* Facilitator */
+.timeline{display:grid;border-left:2px solid var(--line);margin-left:6px}
+.tl{position:relative;padding:0 0 22px 26px}
+.tl:last-child{padding-bottom:0}
+.tl::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+.tl .t{font-family:var(--f-mono);font-size:12.5px;color:var(--accent);font-variant-numeric:tabular-nums}
+.tl h4{font-size:15px;margin:2px 0 4px}
+.tl p{margin:0;font-size:14.5px}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;align-items:start}
+
+footer{border-top:1px solid var(--line);padding-block:28px;font-size:13px;color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(8px);opacity:0;background:var(--ink);color:#fff;padding:10px 18px;border-radius:8px;font-size:13.5px;font-weight:500;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:820px){
+  .links{display:none}
+  .progress{margin-left:auto}
+  .guide,.scope,.two{grid-template-columns:minmax(0,1fr)}
+  .hero{padding-block:44px 28px}
+}
+@media (max-width:520px){
+  .wrap{padding-inline:16px}
+  .row{grid-template-columns:40px minmax(0,1fr)}
+  .row .rm{grid-column:2}
+  .lab-top,.lab-body,.prompt-bar,pre.ptext,.lab-foot{padding-inline:18px}
+  .progress .pbar{display:none}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="mark"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M4 8.5l2.5 2.5L12 5"/></svg></span>Cowork Lab Manual</a>
+    <nav class="links" aria-label="Sections">
+      <a href="#finder">Lab finder</a>
+      <a href="#guide">Guide</a>
+      <a href="#library">All labs</a>
+      <a href="#help">Help</a>
+      <a href="#facilitate">Facilitators</a>
+    </nav>
+    <div class="progress" title="Labs completed in this browser"><span class="pbar"><i id="pfill" style="width:0"></i></span><span id="ptext">0 of 0 done</span></div>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <span class="kicker"><i></i>Copilot Cowork adoption program</span>
+    <h1>Delegate real work to Copilot Cowork</h1>
+    <p>Hands-on labs built from the tasks pilot participants asked for. Pick your role and a task, copy the prompt, and run it on your own Microsoft 365 content.</p>
+    <div class="stats">
+      <div class="stat"><b id="sLabs">–</b><span>hands-on labs</span></div>
+      <div class="stat"><b id="sUcs">–</b><span>use cases</span></div>
+      <div class="stat"><b id="sRoles">–</b><span>role profiles</span></div>
+      <div class="stat"><b>M365</b><span>boundary only</span></div>
+    </div>
+  </div>
+
+  <section id="finder">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-label">Lab finder</span>
+        <h2>Find your lab and copy the prompt</h2>
+        <p>The prompt adjusts to your role and adds the guardrails that apply to your work.</p>
+      </div>
+      <div class="finder">
+        <div>
+          <div class="step-label"><span class="n">1</span>Choose your role</div>
+          <div class="chips" id="roleChips" role="group" aria-label="Role"></div>
+          <label class="toggle" for="recOnly"><input type="checkbox" id="recOnly" checked> Show only labs recommended for my role</label>
+        </div>
+        <div>
+          <div class="step-label"><span class="n">2</span>Choose a use case</div>
+          <div class="chips" id="ucChips" role="group" aria-label="Use case"></div>
+        </div>
+        <div>
+          <div class="step-label"><span class="n">3</span>Choose a task <span class="hint" id="ucDesc"></span></div>
+          <div class="tasks" id="taskCards"></div>
+        </div>
+        <div id="labDetail"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="guide">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-label">Guide</span>
+        <h2>Before you run your first lab</h2>
+        <p>Read this once. It covers what Cowork can reach, what you need, and how to write a prompt that works.</p>
+      </div>
+      <div class="guide">
+        <div class="card wide">
+          <h3>Scope and boundary</h3>
+          <p>All labs run inside your Microsoft 365 tenant. Cowork works only with content you already have permission to see.</p>
+          <div class="scope">
+            <div>
+              <h4><span class="dot" style="background:var(--ok)"></span>In scope</h4>
+              <ul>
+                <li>Outlook mail and calendar</li>
+                <li>Teams chats, channels, meeting recaps and transcripts</li>
+                <li>OneDrive and SharePoint files</li>
+                <li>Word, Excel, PowerPoint, and Loop</li>
+                <li>Notification emails from other systems in your inbox</li>
+              </ul>
+            </div>
+            <div>
+              <h4><span class="dot" style="background:var(--crit)"></span>Not in this pilot</h4>
+              <ul>
+                <li>ServiceNow, Salesforce, and other third-party plugins (not yet approved)</li>
+                <li>Approving or updating records in those systems</li>
+                <li>Sending or posting anything without your review</li>
+                <li>Legal conclusions, tax positions, or security sign-off</li>
+              </ul>
+            </div>
+          </div>
+          <div class="note">
+            <b>Working with systems outside Microsoft 365</b>
+            <ul>
+              <li>Use the notification emails those systems send to your inbox as the source.</li>
+              <li>Export a report to Excel in OneDrive yourself, then point Cowork at that file.</li>
+              <li>Take the final action in the external system yourself, using Cowork's summary.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>What you need</h3>
+          <ol>
+            <li>A Microsoft 365 Copilot license with Copilot Cowork turned on. If you can't find Cowork, contact the pilot team.</li>
+            <li>Real content: a week of email, a few Teams meetings with transcription or recap on, and files in OneDrive or SharePoint.</li>
+            <li>A OneDrive folder called <code>Cowork Labs</code> for your outputs.</li>
+            <li>20–45 minutes per lab. Multi-step tasks can take a few minutes to run.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h3>How the waves work</h3>
+          <p><span class="tag w1">Wave 1</span> Start here. Low risk, quick to check, useful in every role.</p>
+          <p><span class="tag w2">Wave 2</span> Move on once you trust the output. These take more steps or change more.</p>
+          <p><span class="tag sp">Specialist review</span> First drafts in regulated areas. A qualified reviewer must check them.</p>
+        </div>
+
+        <div class="card wide">
+          <h3>Anatomy of a Cowork prompt</h3>
+          <p>Cowork does best with a full brief rather than a question. Every lab prompt has these five parts.</p>
+          <div class="tbl" style="margin-top:14px">
+            <table>
+              <thead><tr><th>Part</th><th>What it says</th><th>Example</th></tr></thead>
+              <tbody>
+                <tr><td>Goal</td><td>The outcome you want, in one or two sentences.</td><td>Create my weekly status report for the past 7 days.</td></tr>
+                <tr><td>Sources</td><td>Where Cowork should look, and where it should not.</td><td>My meetings, sent mail, Teams chats, and files I edited this week.</td></tr>
+                <tr><td>Steps</td><td>The work broken into ordered steps.</td><td>Group by project, then list done, in progress, risks, and next steps.</td></tr>
+                <tr><td>Output</td><td>File type, name, location, length, and audience.</td><td>A Word doc in OneDrive / Cowork Labs, one page.</td></tr>
+                <tr><td>Checkpoint</td><td>What Cowork must not do without you, and how to show its sources.</td><td>Draft the email. Do not send. List the sources for each section.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card wide">
+          <h3>Ground rules</h3>
+          <div class="rules">
+            <div class="rule"><h4>Drafts, not decisions</h4><p>Every lab ends with a draft. You review, edit, and decide what gets sent or shared.</p></div>
+            <div class="rule"><h4>Ask for sources</h4><p>Have Cowork list where each point came from, and spot-check at least two.</p></div>
+            <div class="rule"><h4>Your access, your call</h4><p>Cowork sees what you can see. Check for confidential content before sharing.</p></div>
+            <div class="rule"><h4>Iterate in place</h4><p>If the result is off, give feedback in the same task rather than starting over.</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="library">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-label">All labs</span>
+        <h2>Lab library by use case</h2>
+        <p>Search or filter, then open a lab in the finder.</p>
+      </div>
+      <div class="lib-tools">
+        <label class="search" for="q"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="6"/><path d="M14 14l4 4" stroke-linecap="round"/></svg><input id="q" type="search" placeholder="Search labs, for example &quot;status&quot; or &quot;Excel&quot;" aria-label="Search labs"></label>
+        <div class="chips" id="waveChips" role="group" aria-label="Wave filter"></div>
+      </div>
+      <div id="libOut"></div>
+    </div>
+  </section>
+
+  <section id="help">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-label">Help</span>
+        <h2>Troubleshooting</h2>
+      </div>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Symptom</th><th>Likely cause</th><th>What to try</th></tr></thead>
+          <tbody>
+            <tr><td>Cowork can't find a meeting</td><td>No transcript or recap was recorded, or you weren't an attendee.</td><td>Turn on transcription for future meetings. Name the meeting and date in the prompt.</td></tr>
+            <tr><td>A file is missing from the output</td><td>You don't have access, or it's stored outside Microsoft 365.</td><td>Paste the file link into the prompt, or move a copy to OneDrive.</td></tr>
+            <tr><td>Output is too long or generic</td><td>The prompt has no length limit or audience.</td><td>Add "Keep it under 200 words for [audience]" and describe the tone.</td></tr>
+            <tr><td>Facts are wrong or invented</td><td>The source was ambiguous or thin.</td><td>Ask for sources on each point, and for "Not found" instead of guesses.</td></tr>
+            <tr><td>Task needs ServiceNow or Salesforce</td><td>Those plugins aren't approved yet.</td><td>Use notification emails or an Excel export in OneDrive.</td></tr>
+            <tr><td>Cowork wants to send or change something</td><td>The prompt didn't set a checkpoint.</td><td>Decline, then add "Draft only. Do not send, share, or change anything without my confirmation."</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="facilitate">
+    <div class="wrap two">
+      <div>
+        <div class="sec-head">
+          <span class="sec-label">Facilitators</span>
+          <h2>90-minute live session</h2>
+          <p>Takes every participant through one Wave 1 lab and sets up the next two.</p>
+        </div>
+        <div class="timeline">
+          <div class="tl"><span class="t">0:00–0:10</span><h4>What Cowork is for</h4><p>How it differs from M365 Copilot Chat: multi-step work that ends in a file or draft. Walk through the scope and boundary.</p></div>
+          <div class="tl"><span class="t">0:10–0:20</span><h4>Prompt anatomy</h4><p>Show the five parts on a weak prompt and a strong one.</p></div>
+          <div class="tl"><span class="t">0:20–0:50</span><h4>Lab 1.1, Weekly status report</h4><p>Everyone runs it live. Facilitators help with sources and checkpoints.</p></div>
+          <div class="tl"><span class="t">0:50–1:05</span><h4>Review the output</h4><p>Pairs compare reports against what they remember and note what Cowork missed.</p></div>
+          <div class="tl"><span class="t">1:05–1:20</span><h4>Pick your next lab</h4><p>Use the Lab finder to choose a role-matched Wave 1 lab, usually 2.1 or 4.1.</p></div>
+          <div class="tl"><span class="t">1:20–1:30</span><h4>Questions and feedback</h4><p>Collect blockers, especially tasks that need systems outside Microsoft 365.</p></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:8px">
+        <h3>Recommended path</h3>
+        <ol>
+          <li><b>Week 1:</b> <a href="#lab-1-1">Lab 1.1 Weekly status report</a></li>
+          <li><b>Week 2:</b> <a href="#lab-2-1">Lab 2.1 Meeting prep pack</a></li>
+          <li><b>Week 3:</b> <a href="#lab-4-1">Lab 4.1 Follow-up tracker</a></li>
+          <li><b>Week 4 onward:</b> Wave 2 and role-specific labs</li>
+        </ol>
+        <div class="note">Share a direct link to any lab by adding its number to the page address, for example <code>#lab-2-3</code>.</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">Copilot Cowork adoption program · Microsoft 365 boundary only · Prompts are starting points. Review every output before you use or share it.</div></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const ROLES = {
+  any:   {name:"Any role (generic)", ctx:"", ws:"my main projects and workstreams", guard:"If you are unsure about something, mark it \"To verify\" instead of guessing."},
+  it:    {name:"IT & AI Enablement", ctx:"I work in IT & AI Enablement.", ws:"platform changes, AI enablement initiatives, and service improvements", guard:"Leave out credentials, system configurations, and anything security-sensitive."},
+  legal: {name:"Legal & Trade Compliance", ctx:"I work in Legal & Trade Compliance.", ws:"contract reviews, AI use-case assessments, and trade compliance matters", guard:"Do not state legal conclusions. Mark anything that needs an attorney's judgment as \"For legal review\"."},
+  mkt:   {name:"Marketing & Communications", ctx:"I work in Marketing & Communications.", ws:"campaigns, internal communications, and the content calendar", guard:"Nothing goes to external audiences. Keep every message as a draft for my review."},
+  eng:   {name:"Engineering, Security & Quality", ctx:"I work in Engineering, Security & Quality.", ws:"design reviews, quality investigations, and security assessments", guard:"Do not include vulnerability details or configurations. Mark technical judgments as \"Specialist review\"."},
+  fin:   {name:"Finance, Tax & Investor Relations", ctx:"I work in Finance, Tax & Investor Relations.", ws:"close activities, tax matters, and investor communications", guard:"Do not perform tax calculations or state tax positions. Flag every number I must verify."},
+  people:{name:"People Operations", ctx:"I work in People Operations.", ws:"people analytics, HR programs, and stakeholder requests", guard:"Leave out personal or employee-identifiable information."},
+  proc:  {name:"Procurement", ctx:"I work in Procurement.", ws:"supplier requests, purchase approvals, and sourcing events", guard:"Do not commit to prices, terms, or suppliers in any draft."}
+};
+
+const UCS = [
+  {id:"report", name:"Reporting and status updates", desc:"Turn a week of scattered activity into a report you can send."},
+  {id:"meet", name:"Meeting preparation and follow-up", desc:"Walk into meetings prepared and leave with follow-ups already drafted."},
+  {id:"mail", name:"Email management", desc:"Triage, prioritize, and draft replies without losing track of what matters."},
+  {id:"follow", name:"Follow-ups and stakeholder tracking", desc:"Keep track of what others owe you and who you need to check in with."},
+  {id:"plan", name:"Planning and prioritization", desc:"Plan your week and break work into tasks, with you approving every change."},
+  {id:"research", name:"Research and documentation", desc:"Turn internal knowledge into structured, reusable documents."},
+  {id:"data", name:"Working with data files", desc:"Use Excel files in OneDrive as the input for lists, analysis, and summaries."},
+  {id:"spec", name:"Specialist first drafts", desc:"Prepare first drafts in regulated areas. A qualified reviewer always signs off."}
+];
+
+const ALL = Object.keys(ROLES).filter(r=>r!=="any");
+const LABS = [
+{id:"1.1", uc:"report", title:"Weekly status report", min:30, level:"Beginner", wave:"w1", apps:["Outlook","Teams","OneDrive","Word"],
+ roles:ALL,
+ obj:"A one-page Word status report built from your week's meetings, mail, chats, and files, plus a draft email to your manager.",
+ prompt:`{{ctx}}
+
+Create my weekly status report for the past 7 days.
+
+SOURCES
+- My meetings (transcripts and recaps), sent emails, Teams chats, and files I created or edited this week.
+
+STEPS
+1. Group my work by project or workstream (for example: {{ws}}).
+2. For each one, list what was completed, what is in progress, blockers or risks, and next week's priorities.
+3. Write a 3-line executive summary.
+
+OUTPUT
+- A Word document titled "Weekly Status – [date range]", one page, saved to OneDrive / Cowork Labs.
+- A draft email to [manager name] with the summary in the body and the report attached.
+
+CHECKPOINT
+- Do NOT send the email.
+- Under each project, list the meetings, emails, or files you used.
+- {{guard}}`,
+ steps:["Copy the prompt and fill in the bracketed fields.","Paste it into a new Cowork task and start it.","While it runs, write down the three things you think should appear in the report.","Open the Word file and compare it with your list.","Give feedback in the same task to fix anything missing, then review the draft email."],
+ check:["Every project you worked on appears.","Each project lists its sources.","Nothing confidential is in the summary.","The email is still in Drafts."],
+ watch:["Meetings without transcription only show up through chat or email.","Personal or unrelated threads can slip into the report. Remove them before sending."],
+ stretch:"Once you trust the output, ask Cowork to run this every Friday afternoon if scheduled tasks are available in your tenant."},
+{id:"1.2", uc:"report", title:"Report from an Excel data file", min:35, level:"Intermediate", wave:"w2", apps:["Excel","OneDrive","Word","PowerPoint"],
+ roles:["mkt","it","eng","fin"],
+ obj:"A short report or 3-slide summary built from an Excel file you export, such as campaign results or operational metrics.",
+ prompt:`{{ctx}}
+
+Build a [weekly / monthly] report from the data in [Excel file link in OneDrive].
+
+STEPS
+1. Summarize the key metrics and how they changed compared with [previous period].
+2. Point out the top three highs and top three lows, with the numbers behind each.
+3. Suggest two or three questions I should ask about the results. Do not draw conclusions for me.
+
+OUTPUT
+- A [Word document / 3-slide PowerPoint] named "[Report name] – [period]", saved to OneDrive / Cowork Labs.
+- Use a table or chart where it makes the numbers easier to read.
+
+CHECKPOINT
+- Use only the data in the file. If a figure is missing, write "Not in data".
+- Show the sheet and column for each number you quote.
+- {{guard}}`,
+ steps:["Export the report you need from your source system to Excel and save it in OneDrive.","Fill in the file link and the period in the prompt.","Run the task and open the output.","Check three numbers against the Excel file."],
+ check:["Every number matches the source file.","Highs and lows are backed by data, not opinion.","The output is short enough to read in two minutes."],
+ watch:["Cowork can't reach Salesforce, ServiceNow, or other systems directly. Always export to Excel first.","Merged cells or multiple header rows can confuse the analysis. Clean the sheet before you start."],
+ stretch:"Ask Cowork to add a one-paragraph narrative suitable for an executive update."},
+{id:"1.3", uc:"report", title:"Monthly meeting pack", min:40, level:"Intermediate", wave:"w2", apps:["Outlook","Teams","SharePoint","PowerPoint"],
+ roles:["legal","it","fin","eng"],
+ obj:"A draft deck for a recurring monthly meeting, built from the past month's discussions and documents.",
+ prompt:`{{ctx}}
+
+Prepare the pack for my monthly [meeting name] on [date].
+
+SOURCES
+- Last month's meeting recap and the action items from it.
+- Emails, Teams messages, and documents from the past 30 days about {{ws}}.
+- Documents in [SharePoint site or folder link].
+
+STEPS
+1. Show the status of each action item from last month (done, in progress, overdue).
+2. Summarize the main developments since last month.
+3. List open decisions and proposed agenda items.
+
+OUTPUT
+- A PowerPoint deck of 5 slides or fewer, saved to OneDrive / Cowork Labs.
+- Slide order: action item status, developments, decisions needed, agenda.
+
+CHECKPOINT
+- Do not share the deck or send any invite.
+- Add the sources for each slide in the speaker notes.
+- {{guard}}`,
+ steps:["Find last month's meeting and note the date.","Fill in the meeting name, date, and SharePoint location.","Run the task and review the deck slide by slide.","Check the action item status against your own notes."],
+ check:["Every action item from last month is listed.","Speaker notes show where each point came from.","The deck is ready for light editing, not a rewrite."],
+ watch:["Action items that were only spoken and never written down may be missed."],
+ stretch:"Ask Cowork to draft the pre-read email for attendees and leave it in Drafts."},
+
+{id:"2.1", uc:"meet", title:"Meeting prep pack for tomorrow", min:25, level:"Beginner", wave:"w1", apps:["Outlook","Teams","OneDrive","Word"],
+ roles:ALL,
+ obj:"One briefing document that covers each of tomorrow's meetings: purpose, attendees, history, related files, and what you need to bring.",
+ prompt:`{{ctx}}
+
+Prepare me for tomorrow's meetings.
+
+STEPS
+For each meeting on my calendar tomorrow:
+1. State the purpose, based on the invite and related emails.
+2. List the attendees and my last interaction with each of them on this topic.
+3. Summarize the previous meeting on the same topic, if there was one.
+4. Link the most relevant files and emails.
+5. List what I should prepare or decide, and suggest two questions I could ask.
+
+OUTPUT
+- One Word document called "Meeting prep – [date]", one section per meeting, saved to OneDrive / Cowork Labs.
+- Skip meetings that are personal, optional, or blocked as focus time.
+
+CHECKPOINT
+- Do not accept, decline, or change any meeting.
+- {{guard}}`,
+ steps:["Run the prompt late afternoon the day before.","Open the document and read the first meeting's section.","Check that the linked files are the right ones.","Use the doc in your meetings and note what was useful."],
+ check:["Every relevant meeting has a section.","The history and files are actually related to that meeting.","You could walk into each meeting with only this doc."],
+ watch:["Meetings with vague titles may get weak context. Add a line to the invite or name the topic in the prompt."],
+ stretch:"Change the prompt to cover \"my meetings this week\" and run it on Monday morning."},
+{id:"2.2", uc:"meet", title:"Organize a meeting end to end", min:35, level:"Intermediate", wave:"w2", apps:["Outlook","Teams","SharePoint","Word"],
+ roles:["eng","it","people","legal"],
+ obj:"An agenda, a pre-read pack, and a draft invite for a meeting you need to set up, with the right people suggested.",
+ prompt:`{{ctx}}
+
+Help me organize a meeting about [topic] with a goal of [decision or outcome].
+
+STEPS
+1. Search my mail, Teams chats, and [SharePoint site] for recent content on this topic. Summarize the current state in 5 bullets.
+2. Suggest who should attend, based on who has been involved, and explain why for each person.
+3. Draft a 30–45 minute agenda with timings and owners.
+4. Find 2–3 documents that would make a good pre-read.
+5. Suggest three time slots in the next [5] working days when the core attendees appear free.
+
+OUTPUT
+- A Word document with the summary, attendee list, agenda, and pre-reads, saved to OneDrive / Cowork Labs.
+- A draft meeting invite with the agenda in the body.
+
+CHECKPOINT
+- Do NOT send the invite. I'll confirm the attendees and time first.
+- {{guard}}`,
+ steps:["Fill in the topic and goal.","Run the task and review the suggested attendees first.","Remove anyone who shouldn't be there and pick a time.","Ask Cowork to update the draft invite, then send it yourself."],
+ check:["Suggested attendees each have a clear reason.","The agenda fits the meeting length.","Pre-reads are recent and relevant."],
+ watch:["Availability is based on calendars you can see. Confirm with key people directly if timing is critical."],
+ stretch:"After the meeting, run Lab 2.3 on it."},
+{id:"2.3", uc:"meet", title:"Meeting recap and follow-up email", min:20, level:"Beginner", wave:"w1", apps:["Teams","Outlook"],
+ roles:ALL,
+ obj:"A summary, action items with owners, and a draft follow-up email for your most recent meeting.",
+ prompt:`{{ctx}}
+
+Using the transcript and notes from my meeting [meeting name, or "my most recent Teams meeting"]:
+
+1. Summarize the key discussion points, decisions, and open questions.
+2. List action items with owner and due date. Write "TBD" if not stated.
+3. Draft a follow-up email to the attendees with the summary and action items.
+
+OUTPUT
+- Under 200 words, professional and friendly.
+- Save it as a draft in Outlook.
+
+CHECKPOINT
+- Do NOT send. I'll review and edit first.
+- {{guard}}`,
+ steps:["Pick a meeting that had transcription or recap turned on.","Run the prompt and open the draft in Outlook.","Compare the action items with what you remember.","Edit and send it yourself."],
+ check:["Decisions and action items match what was agreed.","Owners are correct.","Nothing sensitive from side conversations is included."],
+ watch:["Without a transcript, Cowork relies on chat and notes, so the recap will be thinner."],
+ stretch:"Ask Cowork to also add the action items to a Loop component or an Excel tracker."},
+{id:"2.4", uc:"meet", title:"Documentation from a recorded session", min:40, level:"Intermediate", wave:"w2", apps:["Teams","Word","SharePoint"],
+ roles:["it","eng"],
+ obj:"A structured knowledge document drafted from a recorded knowledge-transfer or walkthrough session.",
+ prompt:`{{ctx}}
+
+Turn the recording and transcript of [meeting name and date] into a knowledge document.
+
+STEPS
+1. Identify the main topics covered, in the order they were discussed.
+2. For each topic, write an explanation, any steps or procedures described, and any decisions or caveats mentioned.
+3. Collect terms, systems, and acronyms into a glossary.
+4. List the questions raised that were not answered.
+
+OUTPUT
+- A Word document titled "[Topic] – Knowledge transfer", with headings for each topic, saved to OneDrive / Cowork Labs.
+
+CHECKPOINT
+- Mark anything you're unsure about as "To verify with [presenter]".
+- Do not share or move the document.
+- {{guard}}`,
+ steps:["Pick a recorded session with a transcript.","Run the task and skim the headings first.","Send the document to the presenter for a fact check."],
+ check:["The structure follows the session.","Procedures are complete and in order.","Unanswered questions are captured."],
+ watch:["Screen-shared content that wasn't spoken aloud won't be in the transcript."],
+ stretch:"Ask Cowork to turn the glossary into a table on a SharePoint page draft."},
+
+{id:"3.1", uc:"mail", title:"Inbox triage and priority list", min:20, level:"Beginner", wave:"w1", apps:["Outlook"],
+ roles:ALL,
+ obj:"A ranked list of the emails that need your attention, with a suggested action for each.",
+ prompt:`{{ctx}}
+
+Review my inbox from the past [2] working days and help me prioritize.
+
+STEPS
+1. Group emails into: needs my reply today, needs my reply this week, FYI only, and can ignore.
+2. For each email that needs a reply, give one line on what is being asked and a suggested next step.
+3. Flag anything from [my manager / key stakeholders] at the top.
+
+OUTPUT
+- A short list in the chat, with links to each email.
+
+CHECKPOINT
+- Do not move, delete, flag, or reply to any email.
+- {{guard}}`,
+ steps:["Run it first thing in the morning.","Work through the \"today\" group.","Check the \"can ignore\" group once to make sure nothing important landed there."],
+ check:["Nothing urgent is in the wrong group.","The one-line summaries are accurate.","Links open the right emails."],
+ watch:["Newsletters and automated alerts can crowd the list. Tell Cowork which senders to skip."],
+ stretch:"Ask Cowork to draft replies for the three highest-priority emails (see Lab 3.2)."},
+{id:"3.2", uc:"mail", title:"Draft replies to repetitive emails", min:25, level:"Beginner", wave:"w1", apps:["Outlook","OneDrive"],
+ roles:["legal","proc","mkt","fin"],
+ obj:"Draft replies for a batch of similar requests, based on how you've answered them before.",
+ prompt:`{{ctx}}
+
+Help me answer recurring emails about [type of request, for example "export classification questions"].
+
+STEPS
+1. Find unanswered emails from the past [7] days about this topic.
+2. Look at my previous replies on the same topic to learn my usual answer and tone.
+3. Draft a reply to each one. Use the guidance in [reference document link], if provided.
+4. If a request is unusual or doesn't fit the usual answer, don't draft a reply. Flag it for me instead.
+
+OUTPUT
+- Draft replies saved in Outlook.
+- A list in the chat of which emails got drafts and which were flagged.
+
+CHECKPOINT
+- Do NOT send any reply.
+- {{guard}}`,
+ steps:["Name the request type precisely.","Run the task and open the list of drafts and flags.","Review each draft. Edit and send the ones that are right."],
+ check:["Drafts match your usual answer and tone.","Unusual requests were flagged, not answered.","No draft makes a commitment you wouldn't make."],
+ watch:["If your past answers changed over time, Cowork may mix old and new guidance. Point it to the current reference document."],
+ stretch:"Ask Cowork to turn your standard answer into a reusable reply template in Word."},
+{id:"3.3", uc:"mail", title:"Find a report someone sent and file it", min:15, level:"Beginner", wave:"w1", apps:["Outlook","OneDrive"],
+ roles:["eng","it","fin"],
+ obj:"Locate a specific attachment in your mail, save it to the right folder, and summarize it.",
+ prompt:`{{ctx}}
+
+Check whether [person's name] sent me [report name or description] in the past [14] days.
+
+STEPS
+1. If you find it, save the attachment to OneDrive / [folder name].
+2. Summarize the report in 5 bullets, including any figures that changed since the previous version.
+3. If you don't find it, tell me, and draft a short email asking [person's name] for it.
+
+CHECKPOINT
+- Do NOT send the request email.
+- {{guard}}`,
+ steps:["Fill in the person, report, and folder.","Run it and check the file landed in the right place.","Read the summary and open the report to confirm."],
+ check:["It's the right report and the latest version.","The file is in the right folder.","The summary is accurate."],
+ watch:["Reports shared as links rather than attachments may need you to open the link first."],
+ stretch:"Make this a weekly task for a report you receive every week."},
+
+{id:"4.1", uc:"follow", title:"Who owes me what: follow-up tracker", min:30, level:"Beginner", wave:"w1", apps:["Outlook","Teams","Excel"],
+ roles:ALL,
+ obj:"An Excel tracker of everything others have promised you, with draft nudges for overdue items.",
+ prompt:`{{ctx}}
+
+Find what people owe me across my email, Teams chats, and meeting recaps from the past [30] days.
+
+STEPS
+1. Look for requests I made and commitments others made to me, for example "I'll send it by Friday".
+2. For each one, record who, what, when it was promised, the due date if stated, the source, and whether it looks done.
+3. For open items that are overdue, draft a short, friendly nudge.
+
+OUTPUT
+- An Excel file called "Follow-up tracker" in OneDrive / Cowork Labs with columns: Person, Item, Promised on, Due, Status, Source link.
+- Draft nudges saved in Outlook, or as drafts in the right Teams chat.
+
+CHECKPOINT
+- Do NOT send any nudge.
+- {{guard}}`,
+ steps:["Run the task and open the Excel file.","Sort by Status and Due date.","Mark items that are already done.","Review and send the nudges you agree with."],
+ check:["Items are real commitments, not passing comments.","Each row has a working source link.","The nudges are polite and specific."],
+ watch:["Verbal promises in meetings without a transcript won't be found."],
+ stretch:"Rerun it weekly and ask Cowork to update the same Excel file instead of creating a new one."},
+{id:"4.2", uc:"follow", title:"Stakeholder check-in drafts", min:20, level:"Beginner", wave:"w2", apps:["Outlook","Teams"],
+ roles:["people","mkt","it"],
+ obj:"A list of stakeholders you haven't been in touch with recently, with a tailored check-in message for each.",
+ prompt:`{{ctx}}
+
+Help me keep in touch with my key stakeholders: [names or "the people I work with most on {{ws}}"].
+
+STEPS
+1. For each person, find our last meaningful exchange and the date.
+2. Flag anyone I haven't been in touch with for more than [3] weeks.
+3. For each flagged person, draft a short check-in message that refers to our last topic and asks one useful question.
+
+OUTPUT
+- A table in the chat: Person, Last contact, Topic, Suggested message.
+- Drafts saved in Outlook.
+
+CHECKPOINT
+- Do NOT send anything.
+- {{guard}}`,
+ steps:["List your key stakeholders or let Cowork infer them.","Review the table.","Edit and send the check-ins that make sense."],
+ check:["Last-contact dates are right.","Messages sound like you and refer to real topics."],
+ watch:["Contact by phone or in person won't show up."],
+ stretch:"Ask Cowork to include one relevant update you can share with each person."},
+
+{id:"5.1", uc:"plan", title:"Plan my week", min:25, level:"Intermediate", wave:"w2", apps:["Outlook","Teams","To Do"],
+ roles:ALL,
+ obj:"A prioritized plan for your week, with suggested focus blocks that you approve before anything is added to your calendar.",
+ prompt:`{{ctx}}
+
+Help me plan my week.
+
+STEPS
+1. Review my calendar for this week, plus my flagged emails and open requests from the past [7] days.
+2. List my top 5 priorities for the week, with the reason for each.
+3. Suggest focus blocks for the priorities that need deep work, in gaps on my calendar.
+4. Point out meetings that conflict, overlap, or look optional.
+
+OUTPUT
+- A daily plan in the chat: Monday to Friday, with priorities, meetings, and suggested focus blocks.
+
+CHECKPOINT
+- Do NOT add, move, or decline anything on my calendar until I confirm each change.
+- {{guard}}`,
+ steps:["Run it on Monday morning.","Adjust the priority list.","Confirm which focus blocks to add, then let Cowork create them."],
+ check:["Priorities reflect what really matters this week.","Focus blocks are in sensible places.","Nothing changed on your calendar without your OK."],
+ watch:["Cowork can't see priorities that exist only in your head. Add them to the prompt."],
+ stretch:"Ask Cowork to put the priorities into Microsoft To Do."},
+{id:"5.2", uc:"plan", title:"Break a feature request into tasks", min:35, level:"Intermediate", wave:"w2", apps:["Outlook","Teams","Excel","Word"],
+ roles:["it","eng"],
+ obj:"A task breakdown for a feature or change request, ready for you to enter in your work-tracking system.",
+ prompt:`{{ctx}}
+
+Break the feature request in [email, Teams thread, or document link] into a work plan.
+
+STEPS
+1. Summarize the request: goal, users affected, and constraints.
+2. Break it into tasks with a short description, a suggested owner role, an effort estimate (S/M/L), and dependencies.
+3. List open questions for the requester.
+
+OUTPUT
+- An Excel file called "[Feature] – task plan" in OneDrive / Cowork Labs with columns: Task, Description, Owner role, Effort, Depends on, Open question.
+- A draft email to the requester with the open questions.
+
+CHECKPOINT
+- Do NOT send the email.
+- I'll enter the tasks in [ServiceNow / our tracker] myself. Do not try to create them there.
+- {{guard}}`,
+ steps:["Point Cowork at the request.","Review the task breakdown with your team.","Enter the tasks in your tracking system yourself."],
+ check:["Tasks cover the whole request.","Dependencies make sense.","Open questions are the ones you'd ask."],
+ watch:["ServiceNow plugins aren't approved yet, so registering tasks stays a manual step."],
+ stretch:"Ask Cowork to draft acceptance criteria for each task."},
+
+{id:"6.1", uc:"research", title:"Research a business process", min:35, level:"Intermediate", wave:"w2", apps:["SharePoint","OneDrive","Teams","Word"],
+ roles:["legal","it","people","eng"],
+ obj:"A structured summary of how a business process works today, based on internal documents and discussions.",
+ prompt:`{{ctx}}
+
+Research how [process name] works in our organization today.
+
+SOURCES
+- Documents in [SharePoint site or folder link], my mail, and Teams channels about this process. Internal content only.
+
+STEPS
+1. Describe the process step by step, including who is involved at each step.
+2. List the policies, templates, or systems it relies on, with links.
+3. Point out gaps, inconsistencies between documents, or outdated content.
+
+OUTPUT
+- A Word document titled "[Process] – current state", 2 pages or fewer, saved to OneDrive / Cowork Labs.
+
+CHECKPOINT
+- Cite the source document for each step.
+- Mark anything not documented as "Not found in sources".
+- {{guard}}`,
+ steps:["Name the process and the main SharePoint location.","Run the task.","Check two cited sources.","Share the draft with the process owner for review."],
+ check:["Steps are in the right order.","Each step has a source.","Gaps are clearly called out."],
+ watch:["Cowork only sees documents you have access to. Ask the process owner for missing documents."],
+ stretch:"Ask Cowork to draft a simple process diagram description you can turn into a Visio or PowerPoint flow."},
+{id:"6.2", uc:"research", title:"Consolidate definitions across teams", min:40, level:"Advanced", wave:"w2", apps:["SharePoint","Excel","Word"],
+ roles:["it","fin"],
+ obj:"A glossary that consolidates business terms and data definitions from several teams' documents, with conflicts highlighted.",
+ prompt:`{{ctx}}
+
+Consolidate the business terms and data definitions used in these documents: [links to documents or SharePoint folders].
+
+STEPS
+1. Extract each term, its definition, and the document it came from.
+2. Group identical or similar terms together.
+3. Where teams define the same term differently, show each version side by side.
+
+OUTPUT
+- An Excel file called "Definitions glossary" in OneDrive / Cowork Labs with columns: Term, Definition, Source, Team, Conflict (Y/N), Notes.
+
+CHECKPOINT
+- Do not merge conflicting definitions. Show them as they are.
+- {{guard}}`,
+ steps:["Collect links to the documents.","Run the task.","Filter on Conflict = Y and review those first.","Take conflicts to the owning teams to resolve."],
+ check:["Every term has a source.","Conflicts are real differences, not rewording."],
+ watch:["Large document sets may need to be split into batches."],
+ stretch:"Ask Cowork to draft a proposed single definition for each conflict, marked as a proposal."},
+{id:"6.3", uc:"research", title:"Improve the clarity of a document", min:20, level:"Beginner", wave:"w1", apps:["Word","OneDrive"],
+ roles:["fin","legal","mkt","people"],
+ obj:"A revised version of your document with clearer key points and a short change log, while your original stays untouched.",
+ prompt:`{{ctx}}
+
+Improve the clarity of [document link]. The audience is [audience] and the goal is [what the reader should understand or do].
+
+STEPS
+1. Identify the 3 key messages and check whether they come through in the first paragraph.
+2. Tighten wordy sentences, remove jargon, and make the structure easier to scan.
+3. Keep all facts, figures, and commitments exactly as they are.
+
+OUTPUT
+- A new copy named "[Document name] – clarity edit", saved next to the original.
+- A short list of the main changes and why you made them.
+
+CHECKPOINT
+- Do NOT edit the original document.
+- {{guard}}`,
+ steps:["Pick a document you're about to send.","Run the task and compare the two versions.","Keep the changes you like."],
+ check:["Facts and figures are unchanged.","Key messages are clearer.","The tone still fits your audience."],
+ watch:["Check that any regulated or approved wording wasn't changed."],
+ stretch:"Ask for a 3-sentence executive summary to go at the top."},
+
+{id:"7.1", uc:"data", title:"Distribution list from an Excel file", min:20, level:"Beginner", wave:"w1", apps:["Excel","Outlook"],
+ roles:["it","mkt","people"],
+ obj:"A cleaned contact list and a draft email addressed to the right people, built from an Excel file you provide.",
+ prompt:`{{ctx}}
+
+Use [Excel file link] to build a distribution list.
+
+STEPS
+1. Select the rows where [criteria, for example "Region = EMEA and Status = Active"].
+2. Remove duplicates and rows with missing email addresses. List what you removed.
+3. Draft an email about [topic] to the selected people, putting the addresses in [To / BCC].
+
+OUTPUT
+- A new sheet called "Distribution list" in the same file.
+- A draft email in Outlook.
+
+CHECKPOINT
+- Do NOT send the email.
+- {{guard}}`,
+ steps:["Make sure the file has an email column.","Run the task and check the row count.","Review the removed rows, then the draft."],
+ check:["The number of recipients matches what you expect.","No one outside the criteria is included."],
+ watch:["Large lists may hit Outlook recipient limits. Ask Cowork to split them."],
+ stretch:"Ask Cowork to personalize the first line of the email using a column from the file."},
+{id:"7.2", uc:"data", title:"Find patterns in a dataset", min:35, level:"Intermediate", wave:"w2", apps:["Excel","OneDrive","Word"],
+ roles:["it","eng","fin"],
+ obj:"A summary of trends, outliers, and repeat issues in an Excel export, such as service tickets or quality data.",
+ prompt:`{{ctx}}
+
+Analyze [Excel file link] for the past [30] days.
+
+STEPS
+1. Describe the overall volume and trend over time.
+2. Find the top categories, repeat issues, and outliers.
+3. Compare with the previous [30] days if the data allows.
+4. Suggest 3 questions worth investigating. Do not draw conclusions for me.
+
+OUTPUT
+- A one-page Word summary with at least one chart, saved to OneDrive / Cowork Labs.
+
+CHECKPOINT
+- Use only the data in the file. Show which columns you used for each finding.
+- {{guard}}`,
+ steps:["Export the data to Excel (for example, a ServiceNow ticket report) and save it to OneDrive.","Run the task.","Check the top findings against the file using a filter or PivotTable."],
+ check:["Findings hold up when you check them.","Charts are labeled and accurate."],
+ watch:["Cowork can't pull live data from ServiceNow. The analysis is only as current as your export."],
+ stretch:"Rerun it next month on a new export and ask Cowork to compare the two summaries."},
+
+{id:"8.1", uc:"spec", title:"Security questionnaire first draft", min:45, level:"Advanced", wave:"sp", apps:["SharePoint","Excel","Word"],
+ roles:["eng","it"],
+ obj:"First-draft answers to a customer security questionnaire, based only on your approved answer library.",
+ prompt:`{{ctx}}
+
+Draft answers to the security questionnaire in [file link].
+
+SOURCES
+- Use only the approved answers and policies in [SharePoint answer library link]. Do not use the web or other sources.
+
+STEPS
+1. For each question, find the best-matching approved answer and adapt it to the question.
+2. Add the source document for each answer.
+3. If no approved answer fits, write "NO APPROVED ANSWER – specialist needed" and leave the answer blank.
+
+OUTPUT
+- A copy of the questionnaire named "[Customer] – draft answers", saved to OneDrive / Cowork Labs.
+
+CHECKPOINT
+- Every answer is a draft for specialist review.
+- Do not share the file with the customer.
+- {{guard}}`,
+ steps:["Make sure the approved answer library is up to date.","Run the task.","Send the draft to the security specialist for review."],
+ check:["Every answer cites an approved source.","Unmatched questions are clearly flagged.","No answer overstates a control."],
+ watch:["Answers must not go to a customer without specialist sign-off."],
+ stretch:"Ask Cowork to list the questions with no approved answer, so the library can be updated."},
+{id:"8.2", uc:"spec", title:"AI use-case check against an internal standard", min:40, level:"Advanced", wave:"sp", apps:["SharePoint","Word"],
+ roles:["legal"],
+ obj:"A first-pass checklist comparing a proposed use case with your internal standard, for attorney review.",
+ prompt:`{{ctx}}
+
+Compare the use case described in [document or email link] with our internal standard in [policy document link].
+
+STEPS
+1. Summarize the use case: purpose, data involved, users, and outputs.
+2. For each requirement in the standard, note whether the use case appears to meet it, not meet it, or whether information is missing. Quote the relevant clause.
+3. List the questions to ask the requester.
+
+OUTPUT
+- A Word checklist titled "[Use case] – first-pass review", saved to OneDrive / Cowork Labs.
+- Header on page 1: "Draft for legal review – not legal advice".
+
+CHECKPOINT
+- {{guard}}
+- Do not send or share the document.`,
+ steps:["Point Cowork at the use-case description and the current standard.","Run the task.","Review each line as you would a junior colleague's work."],
+ check:["Every requirement in the standard is covered.","Clauses are quoted accurately.","No line reads as a legal conclusion."],
+ watch:["Cowork can't judge legal risk. This is a structured first pass only."],
+ stretch:"Ask Cowork to draft the email to the requester with the open questions, and leave it in Drafts."},
+{id:"8.3", uc:"spec", title:"Summarize regulatory updates you've received", min:35, level:"Advanced", wave:"sp", apps:["Outlook","SharePoint","Word"],
+ roles:["fin","legal"],
+ obj:"A digest of regulatory or legislative updates that arrived in your mail or SharePoint, with items flagged for specialist attention.",
+ prompt:`{{ctx}}
+
+Summarize the regulatory and legislative updates I received in the past [30] days about [regulation or topic].
+
+SOURCES
+- Newsletters, alerts, and advisor emails in my Outlook, and documents in [SharePoint folder link].
+
+STEPS
+1. List each update with its date, source, and a 2-line plain-language summary.
+2. Note which of our {{ws}} it might affect, as a question for a specialist, not a conclusion.
+3. Group the updates by urgency, based on effective dates mentioned in the source.
+
+OUTPUT
+- A Word digest titled "[Topic] – regulatory updates – [month]", saved to OneDrive / Cowork Labs.
+
+CHECKPOINT
+- {{guard}}
+- Link the original source for every item.`,
+ steps:["Make sure your alert subscriptions go to your inbox.","Run the task.","Review the digest with your specialist team."],
+ check:["Every item links to its original source.","Effective dates are correct.","Nothing is presented as a firm position."],
+ watch:["Cowork only sees updates that reached your mailbox or SharePoint, so this is not a complete regulatory scan."],
+ stretch:"Run it monthly and ask Cowork to compare with last month's digest."},
+{id:"8.4", uc:"spec", title:"Pending approvals digest from notification emails", min:20, level:"Beginner", wave:"w1", apps:["Outlook","Excel"],
+ roles:["legal","it","eng","proc","fin"],
+ obj:"One list of approval requests waiting for you, built from ServiceNow and other notification emails, so you can action them in the source system.",
+ prompt:`{{ctx}}
+
+Find approval requests that are waiting for me, using notification emails in my inbox from the past [14] days (for example, from ServiceNow).
+
+STEPS
+1. For each request, record the request number, requester, what is being requested, the date received, and any due date.
+2. Leave out requests where a later email shows they were already approved, rejected, or cancelled.
+3. Sort by oldest first.
+
+OUTPUT
+- A table in the chat, with a link to each notification email.
+- Also save it as an Excel file, "Pending approvals – [date]", in OneDrive / Cowork Labs.
+
+CHECKPOINT
+- Do not reply to or forward any notification email.
+- I will approve or reject each request in the source system myself.
+- {{guard}}`,
+ steps:["Run the task.","Open each request in ServiceNow (or the source system) from the link in the email.","Approve or reject it there."],
+ check:["The list matches what you see in the source system.","Already-closed requests are excluded."],
+ watch:["This uses email only. If notifications are turned off, requests won't appear. The source system is always the record of truth."],
+ stretch:"Run it every morning and ask Cowork to highlight requests older than 3 days."}
+];
+
+/* ---------- app ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const slug = id => id.replace(".","-");
+const WAVE = {w1:["w1","Wave 1"], w2:["w2","Wave 2"], sp:["sp","Specialist review"]};
+const COPY_ICON = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="5" width="9" height="9" rx="2"/><path d="M11 5V3.5A1.5 1.5 0 009.5 2h-6A1.5 1.5 0 002 3.5v6A1.5 1.5 0 003.5 11H5"/></svg>';
+
+let state = {role:"any", uc:"report", lab:"1.1", rec:true, wave:"all", q:""};
+let done = {};
+try{ Object.assign(state, JSON.parse(localStorage.getItem("cwlm-state")||"{}")); done = JSON.parse(localStorage.getItem("cwlm-done")||"{}"); }catch(e){}
+state.q = ""; state.wave = state.wave || "all";
+const save = () => { try{ localStorage.setItem("cwlm-state", JSON.stringify({role:state.role,uc:state.uc,lab:state.lab,rec:state.rec,wave:state.wave})); localStorage.setItem("cwlm-done", JSON.stringify(done)); }catch(e){} };
+
+const fill = (lab, rk) => { const r = ROLES[rk] || ROLES.any; return lab.prompt.replace(/\{\{ws\}\}/g, r.ws).replace(/\{\{guard\}\}/g, r.guard).replace(/\{\{ctx\}\}/g, r.ctx).replace(/^\n+/, ""); };
+const hl = t => esc(t).replace(/\[[^\]\n]+\]/g, m => `<span class="ph">${m}</span>`);
+const isRec = (lab, rk) => rk === "any" || lab.roles.includes(rk);
+const visible = () => LABS.filter(l => !state.rec || isRec(l, state.role));
+
+function renderRoles(){
+  $("roleChips").innerHTML = Object.entries(ROLES).map(([k,r]) =>
+    `<button class="chip-btn" data-role="${k}" aria-pressed="${state.role===k}">${esc(k==="any"?"Any role":r.name)}</button>`).join("");
+  $("recOnly").checked = state.rec;
+}
+function renderUcs(){
+  const vis = visible();
+  const ucs = UCS.filter(u => vis.some(l => l.uc === u.id));
+  if(!ucs.some(u => u.id === state.uc)) state.uc = ucs[0] ? ucs[0].id : "";
+  $("ucChips").innerHTML = ucs.map(u => {
+    const n = vis.filter(l => l.uc === u.id).length;
+    return `<button class="chip-btn" data-uc="${u.id}" aria-pressed="${state.uc===u.id}">${esc(u.name)}<span class="c">${n}</span></button>`;
+  }).join("");
+  const u = UCS.find(x => x.id === state.uc);
+  $("ucDesc").textContent = u ? "· " + u.desc : "";
+}
+function renderTasks(){
+  const labs = visible().filter(l => l.uc === state.uc);
+  if(!labs.some(l => l.id === state.lab)) state.lab = labs[0] ? labs[0].id : "";
+  $("taskCards").innerHTML = labs.length ? labs.map(l => {
+    const [wc, wl] = WAVE[l.wave];
+    return `<button class="task" data-lab="${l.id}" aria-pressed="${state.lab===l.id}">
+      <span class="tid">Lab ${l.id}</span><span class="tt">${esc(l.title)}</span>
+      <span class="tm"><span class="tag ${wc}">${wl}</span><span class="tag">${l.min} min</span>${done[l.id]?'<span class="ok">✓ Done</span>':""}</span>
+    </button>`;}).join("") : "";
+}
+function renderDetail(){
+  const lab = LABS.find(l => l.id === state.lab);
+  if(!lab){ $("labDetail").innerHTML = `<div class="empty">No labs match. Clear "Show only labs recommended for my role" to see every lab.</div>`; return; }
+  const [wc, wl] = WAVE[lab.wave];
+  const uc = UCS.find(u => u.id === lab.uc);
+  const rec = state.role !== "any" && lab.roles.includes(state.role);
+  $("labDetail").innerHTML = `<article class="lab" id="detail">
+    <div class="lab-top">
+      <div><div class="lab-crumb"><b>Lab ${lab.id}</b> · ${esc(uc.name)}</div><h3>${esc(lab.title)}</h3></div>
+      <div class="lab-tags"><span class="tag ${wc}">${wl}</span>${rec?`<span class="tag rec">Recommended for ${esc(ROLES[state.role].name)}</span>`:""}<span class="tag">${lab.min} min</span><span class="tag">${lab.level}</span></div>
+      <p class="obj">${esc(lab.obj)}</p>
+      <div class="apps">Uses <b>${lab.apps.map(esc).join(", ")}</b></div>
+    </div>
+    <div class="prompt">
+      <div class="prompt-bar"><span class="lg"><span class="ph">[ ]</span> Fill these in before you run the prompt</span><button class="btn" id="copyBtn">${COPY_ICON}Copy prompt</button></div>
+      <pre class="ptext" id="ptext">${hl(fill(lab, state.role))}</pre>
+    </div>
+    <div class="lab-body">
+      <div><h4>How to run it</h4><ol>${lab.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>
+      <div><h4>Check your result</h4><ul>${lab.check.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div><h4>Watch-outs</h4><ul>${lab.watch.map(s=>`<li>${esc(s)}</li>`).join("")}</ul><h4 style="margin-top:18px">Stretch</h4><p>${esc(lab.stretch)}</p></div>
+    </div>
+    <div class="lab-foot">
+      <label class="check" for="doneBox"><input type="checkbox" id="doneBox" ${done[lab.id]?"checked":""}> I've completed this lab</label>
+      <button class="share" id="shareBtn">Copy link to this lab</button>
+    </div>
+  </article>`;
+}
+function renderProgress(){
+  const n = LABS.filter(l => done[l.id]).length;
+  $("ptext").textContent = `${n} of ${LABS.length} done`;
+  $("pfill").style.width = (n / LABS.length * 100) + "%";
+}
+function renderWaves(){
+  const opts = [["all","All waves"],["w1","Wave 1"],["w2","Wave 2"],["sp","Specialist review"]];
+  $("waveChips").innerHTML = opts.map(([k,v]) => `<button class="chip-btn" data-wave="${k}" aria-pressed="${state.wave===k}">${v}</button>`).join("");
+}
+function renderLibrary(){
+  const q = state.q.trim().toLowerCase();
+  const match = l => (state.wave === "all" || l.wave === state.wave) &&
+    (!q || [l.id, l.title, l.obj, l.apps.join(" "), UCS.find(u=>u.id===l.uc).name].join(" ").toLowerCase().includes(q));
+  const html = UCS.map(u => {
+    const labs = LABS.filter(l => l.uc === u.id && match(l));
+    if(!labs.length) return "";
+    return `<div class="group"><div class="group-head"><h3>${esc(u.name)}</h3><span>${labs.length} lab${labs.length>1?"s":""}</span></div><p>${esc(u.desc)}</p>
+      ${labs.map(l => { const [wc,wl] = WAVE[l.wave]; return `<button class="row" data-open="${l.id}">
+        <span class="rid">${l.id}</span><span class="rt">${esc(l.title)}<small>${esc(l.obj)}</small></span>
+        <span class="rm">${done[l.id]?'<span class="tag w1">✓ Done</span>':""}<span class="tag ${wc}">${wl}</span><span class="tag">${l.min} min</span></span></button>`;}).join("")}</div>`;
+  }).join("");
+  $("libOut").innerHTML = html || `<p class="noresults">No labs match "${esc(state.q)}". Try a different word or clear the wave filter.</p>`;
+}
+function renderFinder(){ renderRoles(); renderUcs(); renderTasks(); renderDetail(); save(); }
+function renderAll(){ renderFinder(); renderWaves(); renderLibrary(); renderProgress(); }
+
+function openLab(id, scroll){
+  const lab = LABS.find(l => l.id === id); if(!lab) return;
+  if(!isRec(lab, state.role)) state.rec = false;
+  state.uc = lab.uc; state.lab = id;
+  renderFinder();
+  if(scroll) $("detail").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+}
+
+let tt;
+function toast(msg){ const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 1800); }
+function copyText(text, okMsg, el){
+  const fallback = () => { if(el){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast("Selected. Press Ctrl+C to copy"); } else toast("Copy failed"); };
+  try{ navigator.clipboard.writeText(text).then(() => toast(okMsg), fallback); }catch(e){ fallback(); }
+}
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("button, a"); if(!t) return;
+  if(t.dataset.role){ state.role = t.dataset.role; renderFinder(); return; }
+  if(t.dataset.uc){ state.uc = t.dataset.uc; state.lab = ""; renderUcs(); renderTasks(); renderDetail(); save(); return; }
+  if(t.dataset.lab){ state.lab = t.dataset.lab; renderTasks(); renderDetail(); save(); return; }
+  if(t.dataset.wave){ state.wave = t.dataset.wave; renderWaves(); renderLibrary(); save(); return; }
+  if(t.dataset.open){ openLab(t.dataset.open, true); history.replaceState(null, "", "#lab-" + slug(t.dataset.open)); return; }
+  if(t.id === "copyBtn"){ const lab = LABS.find(l => l.id === state.lab); copyText(fill(lab, state.role), "Prompt copied", $("ptext")); return; }
+  if(t.id === "shareBtn"){ copyText(location.href.split("#")[0] + "#lab-" + slug(state.lab), "Link copied", null); return; }
+  const href = t.getAttribute && t.getAttribute("href");
+  if(href && /^#lab-\d+-\d+$/.test(href)){ e.preventDefault(); openLab(href.slice(5).replace("-","."), true); history.replaceState(null, "", href); }
+});
+document.addEventListener("change", e => {
+  if(e.target.id === "recOnly"){ state.rec = e.target.checked; renderFinder(); }
+  if(e.target.id === "doneBox"){ done[state.lab] = e.target.checked; save(); renderTasks(); renderLibrary(); renderProgress(); toast(e.target.checked ? "Marked complete" : "Marked incomplete"); }
+});
+$("q").addEventListener("input", e => { state.q = e.target.value; renderLibrary(); });
+
+$("sLabs").textContent = LABS.length;
+$("sUcs").textContent = UCS.length;
+$("sRoles").textContent = Object.keys(ROLES).length - 1;
+renderAll();
+
+function fromHash(){
+  const m = location.hash.match(/^#lab-(\d+)-(\d+)$/);
+  if(m) openLab(m[1] + "." + m[2], true);
+}
+window.addEventListener("hashchange", fromHash);
+fromHash();
+</script>
+</body>
+</html>
