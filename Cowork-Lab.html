@@ -139,6 +139,18 @@ pre.ptext{margin:0;padding:20px 26px;font-family:var(--f-mono);font-size:13px;li
 .scope{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:6px}
 .scope h4{font-size:13px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .dot{width:8px;height:8px;border-radius:50%}
+.notice{display:flex;gap:14px;align-items:flex-start;margin-top:28px;max-width:760px;border:1px solid var(--line-strong);border-radius:var(--r);padding:16px 18px;background:var(--surface)}
+.notice svg{flex:none;width:20px;height:20px;color:var(--accent);margin-top:2px}
+.notice b{color:var(--ink)}
+.notice p{margin:0;font-size:14.5px}
+.tmpl-note{padding:12px 26px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--body);background:var(--accent-soft)}
+.tmpl-note b{color:var(--accent-ink)}
+.iter{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:14px;counter-reset:it}
+.iter div{border:1px solid var(--line);border-radius:8px;padding:14px 16px;counter-increment:it}
+.iter div::before{content:counter(it);display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font-size:12px;font-weight:700;margin-bottom:8px}
+.iter h4{font-size:14.5px;margin-bottom:4px}
+.iter p{margin:0;font-size:14px}
+@media (max-width:520px){.tmpl-note{padding-inline:18px}}
 .note{margin-top:18px;background:var(--surface);border-radius:8px;padding:16px 18px;font-size:14.5px}
 .note b{color:var(--ink)}
 .note ul{margin-top:6px}
@@ -227,7 +239,9 @@ footer{border-top:1px solid var(--line);padding-block:28px;font-size:13px;color:
   <div class="wrap hero">
     <span class="kicker"><i></i>Copilot Cowork adoption program</span>
     <h1>Delegate real work to Copilot Cowork</h1>
-    <p>Hands-on labs built from the tasks pilot participants asked for. Pick a use case and a task, copy the prompt, and run it on your own Microsoft 365 content.</p>
+    <p>Hands-on labs built from the use cases discussed. Pick a use case and a task, adapt the prompt structure to your work, and refine it on your own Microsoft 365 content.</p>
+    <div class="notice" role="note"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="8"/><path d="M10 9v5M10 6.2v.1" stroke-linecap="round"/></svg>
+      <p><b>These are prompt structures.</b> Each one shows how to frame a task for Cowork: goal, sources, steps, output, and checkpoint. Expect to fill in the placeholders, adjust the wording to your own work, and refine the prompt over a few runs before it gives you the result you want.</p></div>
     <div class="stats">
       <div class="stat"><b id="sLabs">–</b><span>hands-on labs</span></div>
       <div class="stat"><b id="sUcs">–</b><span>use cases</span></div>
@@ -239,8 +253,8 @@ footer{border-top:1px solid var(--line);padding-block:28px;font-size:13px;color:
     <div class="wrap">
       <div class="sec-head">
         <span class="sec-label">Lab finder</span>
-        <h2>Find your lab and copy the prompt</h2>
-        <p>Every prompt ends with a checkpoint, so Cowork drafts and you decide what gets sent or shared.</p>
+        <h2>Find your lab and start from its prompt structure</h2>
+        <p>Use each prompt as a starting point. Every one ends with a checkpoint, so Cowork drafts and you decide what gets sent or shared.</p>
       </div>
       <div class="finder">
         <div>
@@ -333,6 +347,18 @@ footer{border-top:1px solid var(--line);padding-block:28px;font-size:13px;color:
         </div>
 
         <div class="card wide">
+          <h3>From structure to your prompt</h3>
+          <p>The lab prompts give you a proven shape. Getting a result you'd actually send usually takes two or three rounds.</p>
+          <div class="iter">
+            <div><h4>Adapt</h4><p>Fill in the placeholders. Remove steps you don't need and add details only you know, such as project names, audiences, and the format your team expects.</p></div>
+            <div><h4>Run</h4><p>Start the task in Cowork on real content from your own mail, meetings, and files.</p></div>
+            <div><h4>Review</h4><p>Check the output against your sources. Note what's missing, wrong, too long, or in the wrong tone.</p></div>
+            <div><h4>Refine</h4><p>Give feedback in the same task, then update your prompt so the next run is right the first time.</p></div>
+            <div><h4>Keep</h4><p>Save the version that works in a OneDrive note or Word file so you can reuse it or share it with your team.</p></div>
+          </div>
+        </div>
+
+        <div class="card wide">
           <h3>Ground rules</h3>
           <div class="rules">
             <div class="rule"><h4>Drafts, not decisions</h4><p>Every lab ends with a draft. You review, edit, and decide what gets sent or shared.</p></div>
@@ -413,7 +439,7 @@ footer{border-top:1px solid var(--line);padding-block:28px;font-size:13px;color:
   </section>
 </main>
 
-<footer><div class="wrap">Copilot Cowork adoption program · Microsoft 365 boundary only · Prompts are starting points. Review every output before you use or share it.</div></footer>
+<footer><div class="wrap">Copilot Cowork adoption program · Microsoft 365 boundary only · Prompts are structures to adapt and refine, not ready-to-use prompts. Review every output before you use or share it.</div></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -1060,7 +1086,8 @@ function renderDetail(){
       <div class="apps">Uses <b>${lab.apps.map(esc).join(", ")}</b></div>
     </div>
     <div class="prompt">
-      <div class="prompt-bar"><span class="lg"><span class="ph">[ ]</span> Fill these in before you run the prompt</span><button class="btn" id="copyBtn">${COPY_ICON}Copy prompt</button></div>
+      <div class="tmpl-note"><b>Prompt structure, not a final prompt.</b> Adapt it to your work, run it, then refine it based on what comes back.</div>
+      <div class="prompt-bar"><span class="lg"><span class="ph">[ ]</span> Replace placeholders with your details</span><button class="btn" id="copyBtn">${COPY_ICON}Copy structure</button></div>
       <pre class="ptext" id="ptext">${hl(fill(lab))}</pre>
     </div>
     <div class="lab-body">
@@ -1120,7 +1147,7 @@ document.addEventListener("click", e => {
   if(t.dataset.lab){ state.lab = t.dataset.lab; renderTasks(); renderDetail(); save(); return; }
   if(t.dataset.wave){ state.wave = t.dataset.wave; renderWaves(); renderLibrary(); save(); return; }
   if(t.dataset.open){ openLab(t.dataset.open, true); history.replaceState(null, "", "#lab-" + slug(t.dataset.open)); return; }
-  if(t.id === "copyBtn"){ const lab = LABS.find(l => l.id === state.lab); copyText(fill(lab), "Prompt copied", $("ptext")); return; }
+  if(t.id === "copyBtn"){ const lab = LABS.find(l => l.id === state.lab); copyText(fill(lab), "Prompt structure copied", $("ptext")); return; }
   if(t.id === "shareBtn"){ copyText(location.href.split("#")[0] + "#lab-" + slug(state.lab), "Link copied", null); return; }
   const href = t.getAttribute && t.getAttribute("href");
   if(href && /^#lab-\d+-\d+$/.test(href)){ e.preventDefault(); openLab(href.slice(5).replace("-","."), true); history.replaceState(null, "", href); }
